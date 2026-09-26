@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 100 Midterm I - Portrait Large-Print Cheat Sheet</title>
+  <style>
+    :root {
+      --navy: #17365d;
+      --blue: #dce6f1;
+      --pale: #eef3f8;
+      --gold: #fff2cc;
+      --gold-border: #d6b656;
+      --red: #fce4d6;
+      --red-border: #c65911;
+      --grid: #9aa7b2;
+      --ink: #111;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #d5d8dc;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .sheet {
+      width: 297mm;
+      height: 210mm;
+      margin: 8mm auto;
+      background: white;
+      box-shadow: 0 1mm 4mm rgb(0 0 0 / 20%);
+      display: grid;
+      grid-template-rows: 12mm 1fr 5mm;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .sheet:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 7mm;
+      color: white;
+      background: var(--navy);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 13pt;
+      letter-spacing: 0.15pt;
+    }
+
+    header span {
+      font-size: 7.5pt;
+    }
+
+    .columns {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3.5mm;
+      padding: 2.5mm 6mm 1.5mm;
+    }
+
+    .column {
+      min-width: 0;
+      overflow: hidden;
+      font-size: 7.15pt;
+      line-height: 1.11;
+    }
+
+    h2 {
+      margin: 0.9mm 0 0.7mm;
+      padding: 0.7mm 1mm 0.6mm;
+      color: white;
+      background: var(--navy);
+      font-size: 8.35pt;
+      line-height: 1.05;
+      break-after: avoid;
+    }
+
+    h2:first-child {
+      margin-top: 0;
+    }
+
+    h3 {
+      margin: 0.65mm 0 0.15mm;
+      color: var(--navy);
+      font-size: 7.35pt;
+      line-height: 1.05;
+      break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 0.55mm;
+    }
+
+    ul {
+      margin: 0.1mm 0 0.6mm;
+      padding-left: 3.4mm;
+    }
+
+    li {
+      margin: 0 0 0.22mm;
+    }
+
+    .callout,
+    .trap {
+      margin: 0.65mm 0;
+      padding: 0.75mm 1mm;
+      border: 0.25mm solid;
+      break-inside: avoid;
+    }
+
+    .callout {
+      background: var(--gold);
+      border-color: var(--gold-border);
+    }
+
+    .trap {
+      background: var(--red);
+      border-color: var(--red-border);
+    }
+
+    table {
+      width: 100%;
+      margin: 0.5mm 0 0.75mm;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 6.25pt;
+      line-height: 1.05;
+      break-inside: avoid;
+    }
+
+    th,
+    td {
+      padding: 0.35mm 0.55mm;
+      border: 0.2mm solid var(--grid);
+      text-align: center;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--navy);
+      background: var(--blue);
+      font-weight: 700;
+    }
+
+    .left td {
+      text-align: left;
+    }
+
+    .tight {
+      font-size: 5.85pt;
+    }
+
+    .formula {
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.05pt;
+    }
+
+    footer {
+      margin: 0 6mm;
+      padding-top: 1mm;
+      border-top: 0.2mm solid var(--grid);
+      color: #555;
+      font-size: 5.6pt;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 297mm;
+        background: white;
+      }
+
+      .sheet {
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+
+  <style>
+    /*
+      Portrait large-print edition:
+      Content flows continuously through two columns instead of being locked
+      into three independent columns, so each side uses the available space.
+    */
+    .sheet {
+      width: 210mm;
+      height: 297mm;
+      grid-template-rows: 13mm 1fr 6mm;
+    }
+
+    header {
+      padding: 0 7mm;
+    }
+
+    header h1 {
+      font-size: 14pt;
+    }
+
+    header span {
+      max-width: 48%;
+      font-size: 8.2pt;
+      text-align: right;
+    }
+
+    .columns {
+      display: block;
+      min-height: 0;
+      height: 100%;
+      padding: 3mm 7mm 2mm;
+      column-count: 2;
+      column-gap: 5mm;
+      column-rule: 0.2mm solid var(--grid);
+      column-fill: balance;
+      overflow: hidden;
+      font-size: 8pt;
+      line-height: 1.1;
+    }
+
+    .column {
+      display: contents;
+      font-size: inherit;
+      line-height: inherit;
+      overflow: visible;
+    }
+
+    h2 {
+      margin: 1.1mm 0 0.8mm;
+      padding: 0.8mm 1.1mm 0.7mm;
+      font-size: 9.1pt;
+      line-height: 1.06;
+      break-inside: avoid;
+      break-after: avoid;
+    }
+
+    h3 {
+      margin: 0.85mm 0 0.25mm;
+      font-size: 8.3pt;
+      line-height: 1.08;
+      break-after: avoid;
+    }
+
+    p {
+      margin-bottom: 0.75mm;
+    }
+
+    ul {
+      margin-bottom: 0.8mm;
+      padding-left: 4mm;
+    }
+
+    li {
+      margin-bottom: 0.3mm;
+    }
+
+    .callout,
+    .trap {
+      margin: 0.85mm 0;
+      padding: 0.9mm 1.1mm;
+      break-inside: avoid;
+    }
+
+    table {
+      margin: 0.65mm 0 0.95mm;
+      font-size: 6.9pt;
+      line-height: 1.08;
+      break-inside: avoid;
+    }
+
+    th,
+    td {
+      padding: 0.45mm 0.65mm;
+    }
+
+    .tight {
+      font-size: 6.5pt;
+    }
+
+    footer {
+      margin: 0 7mm;
+      padding-top: 1.1mm;
+      font-size: 6.2pt;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 210mm;
+      }
+
+      .sheet {
+        width: 210mm;
+        height: 297mm;
+      }
+    }
+  </style>
+
+</head>
+<body>
+  <section class="sheet">
+    <header>
+      <h1>AI 100 MIDTERM I - SIDE A</h1>
+      <span>Concepts, intelligence, evaluation, and representation</span>
+    </header>
+
+    <main class="columns">
+      <article class="column">
+        <h2>1. WHAT AI IS + HISTORY (Ch. 1-2)</h2>
+        <p><strong>AI:</strong> science/engineering of principles and systems for perception,
+          learning, reasoning, language, decision, planning, problem-solving, and creativity.
+          It explores possible intelligent systems, not only human copies.</p>
+
+        <div class="callout"><strong>Strong AI:</strong> cognition <strong>is</strong> computation.
+          <strong>Weak AI:</strong> cognition <strong>can be modeled by</strong> computation.
+          Weak is behaviorally testable; Strong is not established by behavior because of the
+          other-minds problem. <strong>RQ1: B.</strong></div>
+
+        <h3>Computation</h3>
+        <ul>
+          <li><strong>Algorithm/effective procedure:</strong> precise executable instructions mapping
+            one finite symbol string to another.</li>
+          <li><strong>Turing machine (TM):</strong> simplest abstract general computer; can compute
+            anything a modern computer can, given enough time/tape; theoretical and often inefficient.</li>
+          <li><strong>Church-Turing thesis:</strong> anything algorithmically computable is
+            TM-computable. Separates impossible/undecidable from merely expensive. <strong>RQ2: B.</strong></li>
+        </ul>
+
+        <h3>Historical through-line</h3>
+        <p><strong>Aristotle</strong> syllogisms &rarr; automata (imitation of life) &rarr;
+          <strong>Llull</strong> combinatorial <em>Ars Magna</em> &rarr; <strong>Hobbes</strong>
+          reasoning as calculation &rarr; <strong>Leibniz</strong> universal language/calculus,
+          binary, calculator &rarr; <strong>Babbage</strong> programmable Analytical Engine &rarr;
+          <strong>Ada Lovelace</strong> symbol manipulation/music/art &rarr; <strong>Boole</strong>
+          algebra of thought &rarr; <strong>Hilbert/Ackermann</strong> Entscheidungsproblem &rarr;
+          <strong>Turing (1936)</strong> formal computation &rarr; <strong>Dartmouth (1956)</strong>
+          (McCarthy et al.) establishes AI as a field.</p>
+
+        <div class="trap"><strong>Trap:</strong> convincing automaton behavior does not prove
+          intelligence or understanding. Even if Strong/Weak AI fail, useful AI artifacts and
+          scientific insights remain.</div>
+
+        <h3>Modern milestones/examples</h3>
+        <p>1997 <strong>Deep Blue</strong> beats Kasparov; 2011 <strong>Watson</strong> wins Jeopardy;
+          2012 <strong>AlexNet</strong> GPU/ImageNet breakthrough; 2016 <strong>AlphaGo</strong>
+          beats Lee Sedol (Move 37); 2018 <strong>AlphaFold</strong>; 2022 <strong>ChatGPT</strong>.
+          Everyday AI: search/ranking, spam, recommendations, translation, Face ID, navigation,
+          and accessibility.</p>
+
+        <h3>Benefits vs risks</h3>
+        <p><strong>Benefits:</strong> discovery, medicine, accessibility, productivity,
+          climate/energy/logistics, augmentation. <strong>Risks:</strong> bias, opacity,
+          unreliable decisions, accountability gaps, misinformation/deepfakes, surveillance,
+          cognitive offloading, sycophancy, hacking, misalignment, concentrated power.</p>
+
+        <h2>2. INTELLIGENCE (Ch. 3)</h2>
+        <p>No universal precise definition: an open-ended set of capacities &mdash; perceive/model,
+          reason, learn/generalize, adapt, communicate, plan/predict, solve/decompose, create,
+          cooperate, introspect, and know limits. Broad transfer to unfamiliar domains matters.</p>
+        <p><strong>Theory families:</strong> performance/psychometric (task scores);
+          structural/functional (mechanisms); cognitive (mental processes); contextual
+          (social/cultural adaptation); existence (conditions enabling intelligence);
+          developmental (competence emergence).</p>
+      </article>
+
+      <article class="column">
+        <h2>INTELLIGENCE THEORIES + IQ</h2>
+        <h3>Sternberg triarchic</h3>
+        <ul>
+          <li><strong>Analytical:</strong> logical decomposition/problem solving ("book smart").</li>
+          <li><strong>Creative:</strong> use experience for novel problems.</li>
+          <li><strong>Practical:</strong> adapt to/shape environment ("street smart").</li>
+        </ul>
+
+        <h3>Gardner multiple intelligences</h3>
+        <p>Verbal-linguistic, logical-mathematical, spatial-visual, bodily-kinesthetic, musical,
+          intrapersonal, interpersonal, naturalist. Main claim: intelligence cannot be captured
+          by one IQ number. <strong>RQ4: B.</strong></p>
+
+        <div class="callout"><strong>Historical child IQ = 100 &times; mental age / chronological age.</strong><br>
+          Mental age 10, actual age 8 &rarr; 100(10/8) = <strong>125 (RQ7: C)</strong>.<br>
+          Modern IQ is normalized, commonly mean 100 and SD 15.</div>
+
+        <p><strong>Binet (1905):</strong> identify children needing educational support
+          (<strong>RQ8: B</strong>), not identify genius or permanently rank innate ability.
+          Scores are rough, non-permanent, and affected by culture/background; score is not intelligence.</p>
+
+        <h2>3. EVALUATING AI</h2>
+        <h3>Turing Test / imitation game</h3>
+        <p>Original: man and woman separately type answers to an interrogator, each seeking to be
+          identified as woman. Modified: computer replaces one player. It passes if the computer
+          convinces the interrogator it is human <strong>at least as often as the human comparison
+          player</strong> (<strong>RQ9: B</strong>). It need not answer perfectly or fool every judge.</p>
+        <p>Course position: ordinary conversational form was effectively reached by LLMs around 2022,
+          but results depend on duration, judges, rules, and protocol. Passing shows behavioral
+          competence, not necessarily understanding. Total/Video tests are harder.</p>
+
+        <h3>ELIZA</h3>
+        <p><strong>Joseph Weizenbaum, MIT, 1966.</strong> Rogerian therapist persona; keyword/pattern
+          rules, pronoun transformations, statements recast as questions, and generic fallback.
+          No language or therapy understanding, yet users projected meaning/personhood
+          (<strong>ELIZA effect</strong>).</p>
+
+        <h3>Chinese Room (Searle)</h3>
+        <p>Rulebooks manipulate Chinese symbols by <strong>shape/position = syntax</strong>, not
+          <strong>meaning = semantics</strong> (<strong>RQ11: B</strong>). Correct responses show
+          competence, not necessarily comprehension. Formal symbol manipulation alone is insufficient
+          for understanding.</p>
+        <p><strong>Systems reply:</strong> person alone lacks understanding, but the whole
+          room/person/books system understands. <strong>Searle:</strong> internalizing all rules still
+          need not add meaning. He does not say no machine can understand; he rejects program execution
+          as sufficient.</p>
+
+        <h3>Other tests</h3>
+        <ul>
+          <li><strong>Reverse Turing Test:</strong> human proves humanness to computer; CAPTCHA.
+            <strong>RQ15: B.</strong></li>
+          <li><strong>Winograd schema:</strong> pronoun/reference ambiguity requiring commonsense;
+            WinoGrande is the large-scale variant.</li>
+          <li><strong>Lovelace Test:</strong> evaluator-constrained, acceptable, aesthetically compelling
+            creative artifact (music/story/art/proof).</li>
+          <li><strong>Visual/Video:</strong> recognition, spatial/counting, causal, social/emotional,
+            and commonsense reasoning.</li>
+        </ul>
+      </article>
+
+      <article class="column">
+        <h2>4. REPRESENTATION (Ch. 8)</h2>
+        <p>A representation is a <strong>surrogate/stand-in</strong> for selected objects, properties,
+          relations, processes, actions, beliefs, or goals. It lets an agent <strong>substitute
+          thinking for acting</strong>. Coffee: hot &rarr; burns &rarr; wait.
+          <strong>RQ56: B.</strong></p>
+
+        <h3>Design principles</h3>
+        <ul>
+          <li>"All models are wrong, but some are useful": perfect fidelity needs the world itself;
+            omit task-irrelevant detail.</li>
+          <li><strong>More information is not always better:</strong> details cost memory/search
+            and can hide relevant structure. Judge a representation relative to the task.</li>
+          <li><strong>Form vs content:</strong> lookup table, repeated counter, and standard addition
+            can compute the same function with different time-memory tradeoffs.</li>
+          <li><strong>Abstraction shrinks search:</strong> sticks/squares reframing reduced choices
+            from C(17,5)=6188 to C(6,3)=20.</li>
+        </ul>
+
+        <h3>Road graph pattern</h3>
+        <p>Nodes=cities; directed edge=one-way road; weight=distance/cost; path cost=sum of weights.
+          Keeps identity/connectivity/distances; discards terrain, flora/fauna, and exact curves.
+          <strong>RQ51: B; RQ54: C.</strong></p>
+
+        <h3>Representation types</h3>
+        <table class="left">
+          <thead><tr><th style="width:30%">Type</th><th>What it encodes</th></tr></thead>
+          <tbody>
+            <tr><td>Feature space</td><td>Measured dimensions; proximity = similar feature values</td></tr>
+            <tr><td>Relational network</td><td>Entities as nodes; relations as links</td></tr>
+            <tr><td>Game/decision tree</td><td>States and successor choices</td></tr>
+            <tr><td>State graph</td><td>States plus labeled transitions</td></tr>
+            <tr><td>Logic</td><td>Propositions/predicates plus inference</td></tr>
+            <tr><td>Procedural</td><td>Knowledge as how-to steps</td></tr>
+            <tr><td>Frame</td><td>Prototype object/scenario with slots</td></tr>
+            <tr><td>Production</td><td>IF condition THEN action/consequence</td></tr>
+            <tr><td>Isomorphic</td><td>Preserves relevant structure/metric; e.g., map</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Choose the graph</h3>
+        <p>Instagram follows = <strong>directed, usually unweighted</strong>; mutual friendship/LinkedIn
+          connection = undirected; road distance = weighted (directed if one-way); planar graph =
+          drawable without crossings.</p>
+
+        <h2>HIGH-YIELD CONCEPT TRAPS</h2>
+        <div class="trap">Strong = <strong>is</strong>; Weak = <strong>modeled by</strong>.
+          Behavior does not establish mind. TT need not fool every judge. ELIZA = patterns, not
+          understanding. Chinese Room = syntax, not semantics. CAPTCHA = Reverse TT. Gardner rejects
+          one-number intelligence. IQ puts mental age on top. More detail is not always better.</div>
+
+        <h2>THEORY ANSWER TEMPLATE</h2>
+        <p><strong>For explain/compare:</strong> (1) define exact term; (2) state mechanism/components;
+          (3) give course example; (4) contrast nearest alternative; (5) state limitation/trap.</p>
+        <p><strong>For argument questions:</strong> claim &rarr; thought experiment/evidence &rarr;
+          inference &rarr; strongest objection/reply &rarr; qualified conclusion.</p>
+        <div class="callout"><strong>Fast examples:</strong> Chinese Room: syntax vs semantics +
+          systems reply. Turing Test: protocol + competence/comprehension limit. Representation:
+          retained vs discarded information + task relevance. AI risk: benefit, failure mode,
+          affected party/accountability, mitigation.</div>
+      </article>
+    </main>
+
+    <footer>
+      <span>Scope: Book Ch. 1, 2, 3, 4, 8, 9 + all lectures + official study/review/theory guides.</span>
+      <span>Duplex A4 landscape | Side A/2</span>
+    </footer>
+  </section>
+
+  <section class="sheet">
+    <header>
+      <h1>AI 100 MIDTERM I - SIDE B</h1>
+      <span>Boolean logic, neurons, automata, Turing machines, and search</span>
+    </header>
+
+    <main class="columns">
+      <article class="column">
+        <h2>5. BOOLEAN ALGEBRA + MP NEURONS (Ch. 4)</h2>
+        <table>
+          <thead><tr><th>A</th><th>B</th><th>A AND B</th><th>A OR B</th><th>A XOR B</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+          </tbody>
+        </table>
+
+        <p>NOT 0=1, NOT 1=0. OR is inclusive/saturated addition (1 OR 1=1).
+          <strong>Functional completeness:</strong> {AND, OR, NOT} can express every Boolean function.
+          Tautology: A OR NOT A. Contradiction: A AND NOT A.</p>
+
+        <div class="callout"><strong>De Morgan:</strong> NOT(A OR B) = (NOT A) AND (NOT B);
+          NOT(A AND B) = (NOT A) OR (NOT B).<br>
+          <strong>Iff/equivalence:</strong> "chess iff not sunny" = C equivalent to NOT S.</div>
+
+        <h3>Official MCQ calculation patterns</h3>
+        <ul>
+          <li>A=T,B=T,C=F: (NOT A AND C) OR NOT(B AND NOT C) =
+            <strong>F (RQ19 B)</strong>.</li>
+          <li>A=T,B=F,C=T: NOT A OR B OR C = <strong>T (RQ20 A)</strong>.</li>
+          <li>X AND NOT Y is true only at (1,0): <strong>RQ21 C</strong>.</li>
+          <li>(P OR Q) AND NOT R: R=0 and P,Q not both 0 &rarr;
+            <strong>3 true rows (RQ22 B)</strong>.</li>
+          <li>A AND NOT A always false: <strong>RQ23 B</strong>. Completeness:
+            <strong>RQ25 B</strong>.</li>
+        </ul>
+        <p>At A=F,B=T,C=F:<br>
+          (NOT A OR B) AND NOT(B AND C) = T;<br>
+          (A OR NOT B) OR C = F;<br>
+          NOT(A OR B) = F = NOT A AND NOT B.</p>
+
+        <div class="trap"><strong>Evaluation order:</strong> parentheses/NOT first, then AND, then OR.
+          Do not confuse NOT A OR B with NOT(A AND B): they differ at (1,0) and (1,1).</div>
+
+        <h3>McCulloch-Pitts threshold neuron</h3>
+        <div class="callout formula">s = &Sigma;(w<sub>i</sub>x<sub>i</sub>); y=1 iff s &ge; &theta;,
+          otherwise y=0.</div>
+        <p>Weights: excitatory (+), inhibitory (-). Output is binary, not the weighted sum.</p>
+        <table>
+          <thead><tr><th>Function</th><th>Weights</th><th>Threshold</th></tr></thead>
+          <tbody>
+            <tr><td>AND</td><td>(1,1)</td><td>2</td></tr>
+            <tr><td>OR</td><td>(1,1)</td><td>1</td></tr>
+            <tr><td>NOT</td><td>(-1)</td><td>-0.5</td></tr>
+            <tr><td>2-of-3 majority</td><td>(1,1,1)</td><td>2</td></tr>
+          </tbody>
+        </table>
+        <p>(1,1), &theta;=2 computes <strong>AND (RQ26 B)</strong>. Input (0,1), weights (1,1),
+          &theta;=1: s=1 &rarr; y=<strong>1 (RQ30 B)</strong>.</p>
+        <div class="trap">One threshold unit computes only <strong>linearly separable</strong>
+          functions; XOR/XNOR need multiple units/layers. A network can implement any Boolean
+          function because AND/OR/NOT are complete. Comparison is <strong>&ge;</strong>. Book's
+          NOT &theta;=0 and slides' -0.5 both work; prefer -0.5.</div>
+      </article>
+
+      <article class="column">
+        <h2>6. CIRCUITS, AUTOMATA, TURING MACHINES</h2>
+        <table class="left tight">
+          <thead><tr><th style="width:31%">Model</th><th>Input / memory / ability</th></tr></thead>
+          <tbody>
+            <tr><td>Boolean circuit</td><td>Fixed Boolean inputs; no memory; fixed function; feedforward</td></tr>
+            <tr><td>Finite automaton</td><td>Any finite string; finite state; regular language; recurrent</td></tr>
+            <tr><td>Turing machine</td><td>Tape string; unbounded R/W tape; general algorithm; recurrent + memory</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Finite automaton (FA/DFA)</h3>
+        <p>Components: finite alphabet/states, start state (arrow from nowhere), accept state
+          (<strong>double/concentric circle; RQ33 C</strong>), labeled transitions. Start &rarr;
+          consume one symbol at a time &rarr; follow transition &rarr; <strong>after the entire finite
+          input</strong>, accept iff final state accepts. Accepted strings form its
+          <strong>regular language</strong>.</p>
+
+        <div class="callout"><strong>Trace every question:</strong> make
+          <code>symbol | old state | new state</code>; use the final row only. Visiting accept early
+          is irrelevant if later symbols leave it.</div>
+
+        <h3>Review/tracing patterns</h3>
+        <ul>
+          <li>Two states, toggle on 1, loop on 0 &rarr; odd number of 1s; 11010 accepts.</li>
+          <li>0 -a&rarr; 1 -a&rarr; 2 -a&rarr; 3, loops on b &rarr; at least three a's.</li>
+          <li>Exactly 101: q0 -1&rarr; q1 -0&rarr; q2 -1&rarr; qA; every wrong/additional symbol
+            &rarr; rejecting sink.</li>
+          <li><strong>RQ36 A:</strong> number of 0s is a multiple of 3.</li>
+          <li><strong>RQ37 C:</strong> baba. <strong>RQ38 B:</strong> ending nonaccepting means reject.</li>
+          <li><strong>RQ39 A:</strong> 100101 &rarr; C, accepted.
+            <strong>RQ40 D:</strong> 0100101. <strong>RQ41 A:</strong> 1010.</li>
+        </ul>
+
+        <div class="trap">FA has finite memory but handles arbitrary <em>finite-length</em> input.
+          It cannot generally count without bound, recognize arbitrary balanced parentheses,
+          or compare arbitrarily distant symbols/palindromes. Infinite ordinary input never
+          finishes, so no final decision.</div>
+
+        <h3>Turing machine</h3>
+        <p>Finite-state control + effectively infinite cell tape + finite alphabet/blank +
+          read/write head. Transition depends on (state, read symbol), then writes, moves L/R
+          (lecture may allow stay), and changes state. Thus:
+          <strong>FA + revisitable external R/W memory = TM (RQ43 C; RQ44 C).</strong></p>
+        <p>TM can accept/reject before reading all initial input, or loop forever.
+          <strong>Universal TM:</strong> input is another TM's encoded program plus its input;
+          it simulates that machine.</p>
+        <p><strong>Limits:</strong> Halting Problem and related undecidable problems: not every
+          well-posed question has an algorithmic decision procedure.</p>
+
+        <h2>7. PROBLEM FORMULATION (Ch. 9)</h2>
+        <p>Specify: <strong>(1)</strong> state representation, <strong>(2)</strong> start,
+          <strong>(3)</strong> goal state/predicate/test, <strong>(4)</strong> actions/operators,
+          <strong>(5)</strong> each action's preconditions and postconditions. Solution = action
+          sequence from start to goal; nodes=states, edges=actions; expansion generates successors.</p>
+        <p>Examples: 8-puzzle (tile arrangement; move blank); water jug ((x,y); fill/empty/pour);
+          Wordle (known letter constraints; guess); navigation (cities/roads). Search is hard due
+          to exponential <strong>combinatorial explosion</strong>.</p>
+      </article>
+
+      <article class="column">
+        <h2>8. SEARCH: BFS, DFS, IDS, COST (Ch. 9)</h2>
+        <p><strong>Queue = FIFO</strong> (pharmacy line) &rarr; BFS.
+          <strong>Stack = LIFO</strong> (plates/recursion) &rarr; DFS. Use a visited/explored
+          set for graph search to avoid cycles/repeated states.</p>
+
+        <table class="tight">
+          <thead><tr><th></th><th>BFS</th><th>DFS</th></tr></thead>
+          <tbody>
+            <tr><td>Order</td><td>Shallowest level first</td><td>One branch, then backtrack</td></tr>
+            <tr><td>Structure</td><td>FIFO queue</td><td>LIFO stack/recursion</td></tr>
+            <tr><td>Complete?</td><td>Yes: finite b, finite-depth goal</td><td>Finite spaces; may chase infinite branch</td></tr>
+            <tr><td>Optimal?</td><td>Shallowest; cost-optimal if equal steps</td><td>No</td></tr>
+            <tr><td>Space</td><td>O(b<sup>d</sup>), exponential</td><td>1+(b-1)d = O(bd), linear depth</td></tr>
+            <tr><td>Clue</td><td>All same-level links first</td><td>Wikipedia rabbit hole</td></tr>
+          </tbody>
+        </table>
+        <p><strong>b</strong> = maximum branching factor; <strong>d</strong> = shallowest solution depth.</p>
+
+        <h3>Core pseudocode</h3>
+        <div class="callout"><strong>BFS:</strong> enqueue start. While queue: dequeue n; if goal,
+          return path; enqueue each unvisited child.<br>
+          <strong>DFS:</strong> push start. While stack: pop n; if goal, return path; push each
+          unvisited child (push order reverses visit order).</div>
+
+        <h3>Iterative deepening (IDS)</h3>
+        <p>Run depth-limited DFS with cutoffs 0,1,2,... Combines BFS-like completeness/shallowest
+          solution with DFS-like linear memory; repeated shallow work is usually cheap because the
+          deepest level dominates.</p>
+
+        <h3>Weighted shortest path / uniform-cost / branch-and-bound</h3>
+        <p>Frontier is a priority queue ordered by accumulated path cost <strong>g(n)</strong>.
+          Expand cheapest path. With nonnegative edge costs, when the cheapest frontier path removed
+          is a goal, it is optimal.</p>
+
+        <div class="trap"><strong>Do not confuse:</strong> BFS minimizes number of edges, not weighted
+          cost. DFS is not optimal. A graph that looks short geometrically may have high weights.
+          Lecture may use "admissibility" for guaranteed optimality; standard later usage often
+          reserves admissible for a heuristic that never overestimates.</div>
+
+        <h2>REVIEW-QUESTION RAPID KEY</h2>
+        <table class="left tight">
+          <thead><tr><th style="width:29%">Topic</th><th>Official answer / discriminator</th></tr></thead>
+          <tbody>
+            <tr><td>Strong AI</td><td>RQ1 B: cognition IS computation</td></tr>
+            <tr><td>TM</td><td>RQ2 B: simplest general theoretical model</td></tr>
+            <tr><td>Gardner</td><td>RQ4 B: not one IQ number</td></tr>
+            <tr><td>IQ</td><td>RQ7 C: 125; RQ8 B: support children</td></tr>
+            <tr><td>Tests</td><td>RQ9 B TT; RQ11 B syntax; RQ15 B reverse TT</td></tr>
+            <tr><td>Boolean</td><td>19 B; 20 A; 21 C; 22 B; 23 B; 25 B</td></tr>
+            <tr><td>Neuron</td><td>RQ26 B AND; RQ30 B output 1</td></tr>
+            <tr><td>FA</td><td>33 C; 36 A; 37 C; 38 B; 39 A; 40 D; 41 A</td></tr>
+            <tr><td>TM</td><td>RQ43 C; RQ44 C</td></tr>
+            <tr><td>Representation</td><td>RQ51 B; RQ54 C; RQ56 B</td></tr>
+          </tbody>
+        </table>
+
+        <h2>LAST-MINUTE TRAPS</h2>
+        <div class="trap">OR is inclusive. Completeness is not tautology. MP output is 0/1, not sum.
+          XOR is not one threshold unit. FA acceptance uses final state after all input. TM tape is
+          writable/revisitable. More detail can hurt. BFS shallowest is not cheapest weighted.
+          DFS can disappear down an infinite branch.</div>
+
+        <h2>THEORY/CALC CHECKLIST</h2>
+        <p><strong>Boolean:</strong> substitute T/F &rarr; NOT &rarr; AND &rarr; OR; show intermediate values.
+          <strong>Neuron:</strong> products &rarr; sum s &rarr; compare s &ge; &theta; &rarr; binary y.
+          <strong>FA:</strong> trace every character &rarr; final state &rarr; accept/reject.
+          <strong>Search:</strong> state/start/goal/actions first; then frontier order; distinguish depth
+          from cost. <strong>Representation:</strong> surrogate, retained/omitted information, task benefit.</p>
+      </article>
+    </main>
+
+    <footer>
+      <span>Scope: Book Ch. 1, 2, 3, 4, 8, 9 + all lectures + official study/review/theory guides.</span>
+      <span>Duplex A4 landscape | Side B/2</span>
+    </footer>
+  </section>
+</body>
+</html>
