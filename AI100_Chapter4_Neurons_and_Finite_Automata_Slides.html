@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 100 Chapter 4 - McCulloch-Pitts Neurons and Finite Automata</title>
+  <style>
+    :root {
+      --navy: #102a43;
+      --blue: #1f6feb;
+      --cyan: #26c6da;
+      --green: #16825d;
+      --amber: #f0a202;
+      --red: #c2413b;
+      --purple: #7356bf;
+      --ink: #17212b;
+      --muted: #52616f;
+      --paper: #f7fafc;
+      --line: #c9d5df;
+      --soft-blue: #e8f1ff;
+      --soft-green: #e7f6ef;
+      --soft-amber: #fff4d6;
+      --soft-red: #fdeceb;
+      --shadow: 0 18px 55px rgb(13 38 63 / 18%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background: #dce5ed;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .deck {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: clamp(26px, 4vh, 58px) clamp(34px, 5vw, 82px) clamp(46px, 6vh, 76px);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 93% 8%, rgb(38 198 218 / 15%), transparent 26%),
+        linear-gradient(135deg, #fff 0%, var(--paper) 100%);
+    }
+
+    .slide.active {
+      display: block;
+      animation: enter 180ms ease-out;
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateX(14px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan), var(--purple));
+    }
+
+    .title-slide {
+      color: white;
+      background:
+        radial-gradient(circle at 82% 22%, rgb(38 198 218 / 24%), transparent 26%),
+        radial-gradient(circle at 14% 80%, rgb(115 86 191 / 30%), transparent 30%),
+        linear-gradient(145deg, #071b2f, #173f66 62%, #0f5570);
+    }
+
+    .title-slide::before {
+      height: 10px;
+      background: linear-gradient(90deg, var(--cyan), #8fe8f2, var(--amber));
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5em;
+      color: var(--blue);
+      font-size: clamp(15px, 1.5vw, 24px);
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .title-slide .eyebrow {
+      color: #8fe8f2;
+    }
+
+    h1 {
+      max-width: 1100px;
+      margin: 0 0 0.35em;
+      font-size: clamp(44px, 6vw, 92px);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      margin: 0 0 0.55em;
+      color: var(--navy);
+      font-size: clamp(32px, 4vw, 62px);
+      line-height: 1;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin: 0 0 0.35em;
+      color: var(--navy);
+      font-size: clamp(20px, 2vw, 31px);
+      line-height: 1.08;
+    }
+
+    p,
+    li {
+      font-size: clamp(17px, 1.55vw, 26px);
+      line-height: 1.34;
+    }
+
+    p {
+      margin: 0.4em 0;
+    }
+
+    ul,
+    ol {
+      margin: 0.5em 0;
+      padding-left: 1.25em;
+    }
+
+    li {
+      margin: 0.22em 0;
+    }
+
+    strong {
+      color: var(--navy);
+    }
+
+    .title-slide strong {
+      color: white;
+    }
+
+    .subtitle {
+      max-width: 940px;
+      color: #dceaf5;
+      font-size: clamp(21px, 2.2vw, 34px);
+      line-height: 1.3;
+    }
+
+    .big-idea {
+      margin: 0.75em 0;
+      padding: 0.65em 0.8em;
+      border-left: 8px solid var(--cyan);
+      border-radius: 0 12px 12px 0;
+      background: var(--soft-blue);
+      color: var(--navy);
+      font-size: clamp(24px, 2.5vw, 40px);
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .title-slide .big-idea {
+      max-width: 1080px;
+      color: white;
+      background: rgb(255 255 255 / 10%);
+      border-color: var(--amber);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(18px, 2.4vw, 40px);
+      align-items: start;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(14px, 1.7vw, 28px);
+      align-items: stretch;
+    }
+
+    .card {
+      min-width: 0;
+      padding: clamp(14px, 1.7vw, 28px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgb(255 255 255 / 88%);
+      box-shadow: 0 6px 20px rgb(13 38 63 / 8%);
+    }
+
+    .card.blue { border-top: 6px solid var(--blue); }
+    .card.green { border-top: 6px solid var(--green); }
+    .card.amber { border-top: 6px solid var(--amber); }
+    .card.purple { border-top: 6px solid var(--purple); }
+
+    .compact p,
+    .compact li {
+      font-size: clamp(15px, 1.3vw, 21px);
+      line-height: 1.25;
+    }
+
+    .formula {
+      margin: 0.35em 0;
+      padding: 0.55em 0.7em;
+      border: 1px solid #b8cce3;
+      border-radius: 14px;
+      background: white;
+      color: var(--navy);
+      font-family: Cambria, Georgia, serif;
+      font-size: clamp(25px, 3vw, 48px);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .formula.small {
+      font-size: clamp(19px, 2vw, 31px);
+    }
+
+    .steps {
+      counter-reset: steps;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      position: relative;
+      min-height: 2em;
+      margin: 0.45em 0;
+      padding-left: 2.45em;
+    }
+
+    .steps li::before {
+      counter-increment: steps;
+      content: counter(steps);
+      position: absolute;
+      left: 0;
+      top: -0.1em;
+      display: grid;
+      width: 1.75em;
+      height: 1.75em;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      background: var(--blue);
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: clamp(14px, 1.25vw, 21px);
+    }
+
+    th,
+    td {
+      padding: 0.42em 0.55em;
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+
+    th {
+      color: var(--navy);
+      background: var(--soft-blue);
+    }
+
+    tr.highlight td {
+      background: var(--soft-green);
+      font-weight: 800;
+    }
+
+    .answer {
+      margin-top: 0.55em;
+      padding: 0.55em 0.7em;
+      border: 1px solid #9bd1b9;
+      border-radius: 12px;
+      background: var(--soft-green);
+      color: #0e5b40;
+      font-size: clamp(16px, 1.45vw, 23px);
+      font-weight: 700;
+    }
+
+    .warning {
+      margin-top: 0.55em;
+      padding: 0.55em 0.7em;
+      border: 1px solid #e8b6b2;
+      border-radius: 12px;
+      background: var(--soft-red);
+      color: #862c27;
+      font-size: clamp(16px, 1.4vw, 22px);
+      font-weight: 650;
+    }
+
+    .refs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 0.75em;
+    }
+
+    .ref {
+      display: inline-block;
+      padding: 0.36em 0.62em;
+      border-radius: 999px;
+      color: white;
+      background: var(--purple);
+      font-size: clamp(11px, 1vw, 16px);
+      font-weight: 800;
+      letter-spacing: 0.015em;
+    }
+
+    .ref.theory {
+      background: var(--green);
+    }
+
+    .ref.lecture {
+      color: var(--navy);
+      background: var(--soft-amber);
+      border: 1px solid #e4be5d;
+    }
+
+    .diagram {
+      width: 100%;
+      max-height: 49vh;
+      margin: 0.4em auto;
+      display: block;
+    }
+
+    .state {
+      fill: white;
+      stroke: var(--navy);
+      stroke-width: 3;
+    }
+
+    .accept-ring {
+      fill: none;
+      stroke: var(--navy);
+      stroke-width: 3;
+    }
+
+    .state-label {
+      fill: var(--navy);
+      font: 700 24px Arial, sans-serif;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .edge {
+      fill: none;
+      stroke: #334e68;
+      stroke-width: 3;
+      marker-end: url(#arrow);
+    }
+
+    .edge-label {
+      fill: var(--navy);
+      font: 700 20px Arial, sans-serif;
+      text-anchor: middle;
+    }
+
+    .trace {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      align-items: center;
+      margin: 0.8em 0;
+    }
+
+    .trace .state-pill,
+    .trace .symbol {
+      display: inline-grid;
+      place-items: center;
+      min-width: 48px;
+      min-height: 48px;
+      padding: 0.35em 0.5em;
+      border-radius: 12px;
+      font-size: clamp(16px, 1.6vw, 25px);
+      font-weight: 800;
+    }
+
+    .trace .state-pill {
+      color: var(--navy);
+      background: var(--soft-blue);
+      border: 2px solid #9ebce0;
+    }
+
+    .trace .state-pill.accept {
+      color: #0e5b40;
+      background: var(--soft-green);
+      border-color: #77be9f;
+    }
+
+    .trace .symbol {
+      min-width: 36px;
+      color: white;
+      background: var(--purple);
+    }
+
+    .arrow-text {
+      color: var(--muted);
+      font-size: clamp(18px, 1.8vw, 27px);
+      font-weight: 800;
+    }
+
+    .question-map {
+      display: grid;
+      grid-template-columns: 0.85fr 1.5fr 1.4fr;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: clamp(12px, 1.05vw, 17px);
+    }
+
+    .question-map > div {
+      padding: 0.48em 0.6em;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .question-map > div:nth-child(3n) {
+      border-right: 0;
+    }
+
+    .question-map .head {
+      color: var(--navy);
+      background: var(--soft-blue);
+      font-weight: 800;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: clamp(13px, 1.15vw, 19px);
+    }
+
+    .nav {
+      position: fixed;
+      right: 18px;
+      bottom: 14px;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px;
+      border: 1px solid rgb(255 255 255 / 45%);
+      border-radius: 999px;
+      background: rgb(16 42 67 / 88%);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav button {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      color: white;
+      background: rgb(255 255 255 / 12%);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .nav button:hover {
+      background: var(--blue);
+    }
+
+    .counter {
+      min-width: 62px;
+      color: white;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+    }
+
+    .progress {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 21;
+      height: 5px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      transition: width 160ms ease;
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      color: rgb(255 255 255 / 72%);
+      font-size: 14px;
+      transform: translateX(-50%);
+    }
+
+    @media (max-aspect-ratio: 4/3) {
+      .slide {
+        overflow-y: auto;
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 297mm;
+        height: auto;
+        overflow: visible;
+        background: white;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .deck {
+        height: auto;
+      }
+
+      .slide,
+      .slide.active {
+        position: relative;
+        display: block;
+        width: 297mm;
+        height: 210mm;
+        page-break-after: always;
+        break-after: page;
+        animation: none;
+      }
+
+      .nav,
+      .progress,
+      .hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" id="deck">
+    <section class="slide title-slide active">
+      <p class="eyebrow">AI 100 | Chapter 4 Concept Deck</p>
+      <h1>McCulloch-Pitts Neurons &amp; Finite Automata</h1>
+      <p class="subtitle">From one binary decision to a machine that remembers a sequence.</p>
+      <div class="big-idea">Neuron = weighted yes/no decision. Automaton = finite memory updated one symbol at a time.</div>
+      <div class="refs">
+        <span class="ref lecture">Book Ch. 4</span>
+        <span class="ref lecture">Lectures 9/8, 9/10, 9/15</span>
+        <span class="ref">Review Q22-26, 30, 33, 36-44</span>
+        <span class="ref theory">Theory Q1-16</span>
+      </div>
+      <p class="hint">Use the arrow keys, Space, or the buttons to navigate</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Mental model</p>
+      <h2>Three levels of computational power</h2>
+      <div class="grid-3">
+        <div class="card blue">
+          <h3>Boolean circuit</h3>
+          <p><strong>Question:</strong> What output follows from the current input?</p>
+          <p><strong>Memory:</strong> None</p>
+          <p><strong>Neural analogy:</strong> Feedforward network</p>
+        </div>
+        <div class="card green">
+          <h3>Finite automaton</h3>
+          <p><strong>Question:</strong> What state follows from the old state and current symbol?</p>
+          <p><strong>Memory:</strong> One of finitely many states</p>
+          <p><strong>Neural analogy:</strong> Recurrent network</p>
+        </div>
+        <div class="card purple">
+          <h3>Turing machine</h3>
+          <p><strong>Question:</strong> What can be computed with writable external memory?</p>
+          <p><strong>Memory:</strong> Unbounded tape</p>
+          <p><strong>Relation:</strong> Automaton + external memory</p>
+        </div>
+      </div>
+      <div class="refs">
+        <span class="ref">Review Q43-44</span>
+        <span class="ref lecture">Lecture 9/15</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Prerequisite</p>
+      <h2>Boolean logic is the neuron’s vocabulary</h2>
+      <div class="grid-2">
+        <table>
+          <thead>
+            <tr><th>A</th><th>B</th><th>AND</th><th>OR</th><th>XOR</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+          </tbody>
+        </table>
+        <div>
+          <ul>
+            <li><strong>AND:</strong> all required conditions are true.</li>
+            <li><strong>OR:</strong> at least one condition is true.</li>
+            <li><strong>NOT:</strong> flips 0 and 1.</li>
+            <li><strong>XOR:</strong> inputs differ.</li>
+            <li><strong>{AND, OR, NOT} is complete:</strong> together they can express every Boolean function.</li>
+          </ul>
+          <div class="warning">Evaluate parentheses and NOT first, then AND, then OR.</div>
+        </div>
+      </div>
+      <div class="refs">
+        <span class="ref">Review Q22-25</span>
+        <span class="ref theory">Theory Q1-3</span>
+        <span class="ref lecture">Lecture 9/8</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">McCulloch-Pitts neuron</p>
+      <h2>A weighted vote followed by a threshold</h2>
+      <div class="formula">s = &Sigma;<sub>i=1</sub><sup>M</sup> w<sub>i</sub>x<sub>i</sub></div>
+      <div class="formula small">y = 1 if s &ge; &theta;; otherwise y = 0</div>
+      <div class="grid-3 compact">
+        <div class="card blue">
+          <h3>Inputs x<sub>i</sub></h3>
+          <p>Binary facts: each is 0 or 1.</p>
+        </div>
+        <div class="card amber">
+          <h3>Weights w<sub>i</sub></h3>
+          <p>Positive encourages firing; negative inhibits it.</p>
+        </div>
+        <div class="card green">
+          <h3>Threshold &theta;</h3>
+          <p>The minimum weighted sum needed to output 1.</p>
+        </div>
+      </div>
+      <div class="warning">Exam trap: the weighted sum can be 2 or 3, but the neuron’s output is always only 0 or 1.</div>
+      <div class="refs">
+        <span class="ref">Review Q30</span>
+        <span class="ref theory">Theory Q4</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Calculation routine</p>
+      <h2>Never guess: use the same four steps</h2>
+      <div class="grid-2">
+        <ol class="steps">
+          <li>Multiply each input by its weight.</li>
+          <li>Add the products to obtain <strong>s</strong>.</li>
+          <li>Compare using <strong>s &ge; &theta;</strong>.</li>
+          <li>Return the binary output <strong>y</strong>.</li>
+        </ol>
+        <div class="card blue">
+          <h3>Worked example</h3>
+          <p>x<sub>1</sub>=0, x<sub>2</sub>=1; w<sub>1</sub>=w<sub>2</sub>=1; &theta;=1</p>
+          <div class="formula small">s=(1)(0)+(1)(1)=1</div>
+          <div class="formula small">1 &ge; 1 &rArr; y=1</div>
+          <div class="answer">Review Q30 answer: B (output 1)</div>
+        </div>
+      </div>
+      <div class="refs">
+        <span class="ref">Review Q30</span>
+        <span class="ref theory">Theory Q4</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Canonical neuron 1</p>
+      <h2>AND requires both votes</h2>
+      <div class="grid-2">
+        <div>
+          <div class="formula small">w<sub>1</sub>=1, w<sub>2</sub>=1, &theta;=2</div>
+          <p>The maximum sum is 2. Therefore, the neuron fires only when both inputs are 1.</p>
+          <div class="answer">This neuron computes AND. Review Q26 answer: B.</div>
+        </div>
+        <table>
+          <thead><tr><th>x<sub>1</sub></th><th>x<sub>2</sub></th><th>s</th><th>s &ge; 2?</th><th>y</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>0</td><td>0</td><td>No</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>1</td><td>No</td><td>0</td></tr>
+            <tr><td>1</td><td>0</td><td>1</td><td>No</td><td>0</td></tr>
+            <tr class="highlight"><td>1</td><td>1</td><td>2</td><td>Yes</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="refs">
+        <span class="ref">Review Q26</span>
+        <span class="ref theory">Theory Q5</span>
+        <span class="ref lecture">Lecture 9/8</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Canonical neurons 2-3</p>
+      <h2>OR needs one vote; NOT uses inhibition</h2>
+      <div class="grid-2">
+        <div class="card green">
+          <h3>OR</h3>
+          <div class="formula small">w=(1,1), &theta;=1</div>
+          <p>Any single input of 1 reaches the threshold.</p>
+          <p><strong>00 &rarr; 0</strong>; 01, 10, 11 &rarr; 1</p>
+          <div class="answer">Theory Q13: w<sub>1</sub>=w<sub>2</sub>=1, &theta;=1.</div>
+        </div>
+        <div class="card amber">
+          <h3>NOT</h3>
+          <div class="formula small">w=-1, &theta;=-0.5</div>
+          <p>x=0: s=0 &ge; -0.5 &rArr; y=1</p>
+          <p>x=1: s=-1 &lt; -0.5 &rArr; y=0</p>
+          <div class="answer">Theory Q6: weight -1, threshold -0.5.</div>
+        </div>
+      </div>
+      <div class="warning">Course convention: use &theta;=-0.5 for NOT. The book’s &theta;=0 also works for binary input under the &ge; rule.</div>
+      <div class="refs">
+        <span class="ref theory">Theory Q6, Q13</span>
+        <span class="ref">Review Q30 reinforces OR</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Threshold behavior</p>
+      <h2>A 2-of-3 majority neuron</h2>
+      <div class="formula small">w=(1,1,1), &theta;=2</div>
+      <div class="grid-2">
+        <table>
+          <thead><tr><th>Inputs</th><th>Sum</th><th>Output</th></tr></thead>
+          <tbody>
+            <tr><td>000</td><td>0</td><td>0</td></tr>
+            <tr><td>001, 010, 100</td><td>1</td><td>0</td></tr>
+            <tr class="highlight"><td>011, 101, 110</td><td>2</td><td>1</td></tr>
+            <tr class="highlight"><td>111</td><td>3</td><td>1</td></tr>
+          </tbody>
+        </table>
+        <div>
+          <p>The threshold divides all possible inputs into two groups:</p>
+          <ul>
+            <li>Weighted sum below 2 &rarr; output 0</li>
+            <li>Weighted sum at least 2 &rarr; output 1</li>
+          </ul>
+          <div class="big-idea">A threshold is a decision boundary.</div>
+        </div>
+      </div>
+      <div class="refs">
+        <span class="ref theory">Theory Q4</span>
+        <span class="ref lecture">Lecture 9/8</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Limitation</p>
+      <h2>Why one neuron cannot compute XOR</h2>
+      <div class="grid-2">
+        <div>
+          <table>
+            <thead><tr><th>x<sub>1</sub></th><th>x<sub>2</sub></th><th>XOR</th></tr></thead>
+            <tbody>
+              <tr><td>0</td><td>0</td><td>0</td></tr>
+              <tr class="highlight"><td>0</td><td>1</td><td>1</td></tr>
+              <tr class="highlight"><td>1</td><td>0</td><td>1</td></tr>
+              <tr><td>1</td><td>1</td><td>0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <p>A single threshold unit creates one straight decision boundary.</p>
+          <p>For XOR, the two positive points are diagonally opposite. No one line separates
+            them from both negative points.</p>
+          <div class="warning">XOR and XNOR are not linearly separable, so one threshold neuron is insufficient.</div>
+        </div>
+      </div>
+      <div class="refs">
+        <span class="ref">Review Q25-26 concept link</span>
+        <span class="ref lecture">Lecture 9/8</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Networks</p>
+      <h2>Multiple neurons solve what one neuron cannot</h2>
+      <div class="formula small">XOR = (x<sub>1</sub> OR x<sub>2</sub>) AND NOT(x<sub>1</sub> AND x<sub>2</sub>)</div>
+      <div class="grid-3 compact">
+        <div class="card green">
+          <h3>Layer 1A</h3>
+          <p>Compute x<sub>1</sub> OR x<sub>2</sub>.</p>
+        </div>
+        <div class="card amber">
+          <h3>Layer 1B</h3>
+          <p>Compute NOT(x<sub>1</sub> AND x<sub>2</sub>).</p>
+        </div>
+        <div class="card blue">
+          <h3>Layer 2</h3>
+          <p>AND the two intermediate results.</p>
+        </div>
+      </div>
+      <div class="big-idea">AND, OR, and NOT are functionally complete, so a suitable network can implement any Boolean function.</div>
+      <div class="refs">
+        <span class="ref">Review Q25</span>
+        <span class="ref theory">Theory Q5, Q6, Q13</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Neuron question checkpoint</p>
+      <h2>What the official questions are testing</h2>
+      <div class="question-map">
+        <div class="head">Question</div><div class="head">Skill</div><div class="head">Answer cue</div>
+        <div>Review Q26</div><div>Identify gate from weights/threshold</div><div>(1,1), &theta;=2 &rArr; AND (B)</div>
+        <div>Review Q30</div><div>Calculate one neuron output</div><div>s=1 &ge; 1 &rArr; output 1 (B)</div>
+        <div>Theory Q4</div><div>State firing condition</div><div>&Sigma;w<sub>i</sub>x<sub>i</sub> &ge; &theta;</div>
+        <div>Theory Q5</div><div>Design AND neuron</div><div>w=(1,1), &theta;=2</div>
+        <div>Theory Q6</div><div>Design NOT neuron</div><div>w=-1, &theta;=-0.5</div>
+        <div>Theory Q13</div><div>Design OR neuron</div><div>w=(1,1), &theta;=1</div>
+      </div>
+      <div class="answer">Full-credit calculation: products &rarr; weighted sum &rarr; threshold comparison &rarr; binary output.</div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Finite automata</p>
+      <h2>A machine with a small, fixed memory</h2>
+      <div class="grid-2">
+        <div>
+          <ol class="steps">
+            <li>Begin in the start state.</li>
+            <li>Read one input symbol.</li>
+            <li>Follow that symbol’s transition.</li>
+            <li>Repeat until the entire finite string is read.</li>
+            <li>Accept iff the final state is accepting.</li>
+          </ol>
+        </div>
+        <div class="card blue">
+          <h3>The state is the memory</h3>
+          <p>The machine does not store the whole input. Its current state summarizes only the past information relevant to the task.</p>
+          <div class="big-idea">next state = f(current state, current symbol)</div>
+        </div>
+      </div>
+      <div class="refs">
+        <span class="ref theory">Theory Q7-8</span>
+        <span class="ref">Review Q33, Q38</span>
+        <span class="ref lecture">Lecture 9/10</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Diagram language</p>
+      <h2>Read the symbols before tracing</h2>
+      <div class="grid-3">
+        <div class="card blue">
+          <h3>Start</h3>
+          <svg class="diagram" viewBox="0 0 260 150" aria-label="Start-state example">
+            <defs><marker id="arrowA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334e68"/></marker></defs>
+            <path d="M25 75 L91 75" fill="none" stroke="#334e68" stroke-width="4" marker-end="url(#arrowA)"/>
+            <circle cx="140" cy="75" r="42" class="state"/>
+            <text x="140" y="75" class="state-label">q0</text>
+          </svg>
+          <p>An arrow from nowhere marks the start state.</p>
+        </div>
+        <div class="card green">
+          <h3>Accept</h3>
+          <svg class="diagram" viewBox="0 0 260 150" aria-label="Accept-state example">
+            <circle cx="130" cy="75" r="45" class="state"/>
+            <circle cx="130" cy="75" r="36" class="accept-ring"/>
+            <text x="130" y="75" class="state-label">qA</text>
+          </svg>
+          <p>A double/concentric circle marks an accepting state.</p>
+        </div>
+        <div class="card amber">
+          <h3>Transition</h3>
+          <svg class="diagram" viewBox="0 0 300 150" aria-label="Transition example">
+            <defs><marker id="arrowB" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334e68"/></marker></defs>
+            <circle cx="55" cy="85" r="34" class="state"/>
+            <circle cx="245" cy="85" r="34" class="state"/>
+            <path d="M91 85 L205 85" fill="none" stroke="#334e68" stroke-width="4" marker-end="url(#arrowB)"/>
+            <text x="148" y="67" class="edge-label">1</text>
+          </svg>
+          <p>The edge label tells which input causes the move.</p>
+        </div>
+      </div>
+      <div class="answer">Review Q33 answer: C — a double (concentric) circle.</div>
+      <div class="refs">
+        <span class="ref">Review Q33</span>
+        <span class="ref theory">Theory Q8</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Core example</p>
+      <h2>Remember whether the number of 1s is odd</h2>
+      <svg class="diagram" viewBox="0 0 900 360" aria-label="Odd number of ones automaton">
+        <defs><marker id="arrowC" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334e68"/></marker></defs>
+        <path d="M70 180 L210 180" class="edge" marker-end="url(#arrowC)"/>
+        <circle cx="285" cy="180" r="62" class="state"/>
+        <text x="285" y="180" class="state-label">EVEN</text>
+        <circle cx="650" cy="180" r="62" class="state"/>
+        <circle cx="650" cy="180" r="51" class="accept-ring"/>
+        <text x="650" y="180" class="state-label">ODD</text>
+        <path d="M344 157 C430 70 520 70 591 157" class="edge" marker-end="url(#arrowC)"/>
+        <text x="468" y="85" class="edge-label">1</text>
+        <path d="M591 205 C520 292 430 292 344 205" class="edge" marker-end="url(#arrowC)"/>
+        <text x="468" y="306" class="edge-label">1</text>
+        <path d="M260 118 C204 34 366 34 310 118" class="edge" marker-end="url(#arrowC)"/>
+        <text x="285" y="36" class="edge-label">0</text>
+        <path d="M625 118 C569 34 731 34 675 118" class="edge" marker-end="url(#arrowC)"/>
+        <text x="650" y="36" class="edge-label">0</text>
+      </svg>
+      <div class="grid-2 compact">
+        <p><strong>Reading 1 toggles:</strong> even becomes odd; odd becomes even.</p>
+        <p><strong>Reading 0 loops:</strong> it does not change the number of 1s.</p>
+      </div>
+      <div class="refs">
+        <span class="ref theory">Theory Q9, Q10, Q14</span>
+        <span class="ref lecture">Lecture 9/10</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Trace, do not eyeball</p>
+      <h2>Does the odd-1s machine accept 11010?</h2>
+      <div class="trace" aria-label="State trace for 11010">
+        <span class="state-pill">EVEN</span><span class="arrow-text">&rarr;</span>
+        <span class="symbol">1</span><span class="state-pill accept">ODD</span><span class="arrow-text">&rarr;</span>
+        <span class="symbol">1</span><span class="state-pill">EVEN</span><span class="arrow-text">&rarr;</span>
+        <span class="symbol">0</span><span class="state-pill">EVEN</span><span class="arrow-text">&rarr;</span>
+        <span class="symbol">1</span><span class="state-pill accept">ODD</span><span class="arrow-text">&rarr;</span>
+        <span class="symbol">0</span><span class="state-pill accept">ODD</span>
+      </div>
+      <table>
+        <thead><tr><th>Read</th><th>Old state</th><th>New state</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Even</td><td>Odd</td></tr>
+          <tr><td>1</td><td>Odd</td><td>Even</td></tr>
+          <tr><td>0</td><td>Even</td><td>Even</td></tr>
+          <tr><td>1</td><td>Even</td><td>Odd</td></tr>
+          <tr class="highlight"><td>0</td><td>Odd</td><td>Odd (accept)</td></tr>
+        </tbody>
+      </table>
+      <div class="answer">Yes. It ends in the accept state. Theory Q9 answer: accepted; Q14: 10 is also accepted.</div>
+      <div class="refs">
+        <span class="ref theory">Theory Q9, Q14</span>
+        <span class="ref">Review Q38</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Language and termination</p>
+      <h2>What does the machine accept?</h2>
+      <div class="grid-2">
+        <div class="card green">
+          <h3>Language</h3>
+          <p>The <strong>language</strong> is the set of all strings accepted by the machine.</p>
+          <p>Odd-1s examples: <strong>1, 10, 01, 111, 11010</strong>.</p>
+          <p>Finite-automaton languages are called <strong>regular languages</strong>.</p>
+        </div>
+        <div class="card amber">
+          <h3>Infinite ordinary input</h3>
+          <p>The machine decides only when the input ends.</p>
+          <p>If the string never ends, it continues changing states and never produces the ordinary final accept/reject decision.</p>
+        </div>
+      </div>
+      <div class="warning">Passing through an accept state early is not enough. Acceptance depends on the final state after the entire finite input.</div>
+      <div class="refs">
+        <span class="ref theory">Theory Q7, Q8, Q10, Q11</span>
+        <span class="ref">Review Q38</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Counting with finite state</p>
+      <h2>Multiples of 3 require only three states</h2>
+      <div class="grid-2">
+        <div>
+          <p>Let each state remember the number of 0s modulo 3:</p>
+          <ul>
+            <li>q<sub>0</sub>: remainder 0 — accepting</li>
+            <li>q<sub>1</sub>: remainder 1</li>
+            <li>q<sub>2</sub>: remainder 2</li>
+          </ul>
+          <p>Reading 0 advances q<sub>0</sub>&rarr;q<sub>1</sub>&rarr;q<sub>2</sub>&rarr;q<sub>0</sub>. Reading 1 loops.</p>
+        </div>
+        <div class="card blue">
+          <h3>How to identify the language</h3>
+          <ol>
+            <li>Determine what each state summarizes.</li>
+            <li>See which symbols change that summary.</li>
+            <li>Interpret the accepting state.</li>
+          </ol>
+          <div class="answer">Review Q36: number of 0s is a multiple of 3 (A).</div>
+        </div>
+      </div>
+      <div class="refs">
+        <span class="ref">Review Q36</span>
+        <span class="ref lecture">Lecture 9/10</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Counting progress</p>
+      <h2>At least three a’s</h2>
+      <svg class="diagram" viewBox="0 0 1000 300" aria-label="At least three a automaton">
+        <defs><marker id="arrowD" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334e68"/></marker></defs>
+        <path d="M30 165 L105 165" class="edge" marker-end="url(#arrowD)"/>
+        <circle cx="165" cy="165" r="48" class="state"/><text x="165" y="165" class="state-label">0</text>
+        <circle cx="390" cy="165" r="48" class="state"/><text x="390" y="165" class="state-label">1</text>
+        <circle cx="615" cy="165" r="48" class="state"/><text x="615" y="165" class="state-label">2</text>
+        <circle cx="840" cy="165" r="48" class="state"/><circle cx="840" cy="165" r="38" class="accept-ring"/><text x="840" y="165" class="state-label">3</text>
+        <path d="M215 165 L338 165" class="edge" marker-end="url(#arrowD)"/><text x="276" y="145" class="edge-label">a</text>
+        <path d="M440 165 L563 165" class="edge" marker-end="url(#arrowD)"/><text x="501" y="145" class="edge-label">a</text>
+        <path d="M665 165 L788 165" class="edge" marker-end="url(#arrowD)"/><text x="726" y="145" class="edge-label">a</text>
+        <text x="165" y="72" class="edge-label">b loops</text>
+        <text x="390" y="72" class="edge-label">b loops</text>
+        <text x="615" y="72" class="edge-label">b loops</text>
+        <text x="840" y="72" class="edge-label">a,b loop</text>
+      </svg>
+      <p>States 0,1,2 record progress. State 3 means “at least three a’s have occurred.”</p>
+      <div class="answer">Theory Q12: minimum 3 a’s. Review Q37: baba ends at state 2 and is accepted (C).</div>
+      <div class="refs">
+        <span class="ref">Review Q37</span>
+        <span class="ref theory">Theory Q12</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Designing an automaton</p>
+      <h2>Accept exactly 101 — and nothing else</h2>
+      <div class="formula small">q0 --1&rarr; q1 --0&rarr; q2 --1&rarr; qA</div>
+      <div class="grid-2">
+        <div>
+          <p>Each state means “this much of 101 has been matched.”</p>
+          <ul>
+            <li>q0: nothing matched</li>
+            <li>q1: matched 1</li>
+            <li>q2: matched 10</li>
+            <li>qA: matched exactly 101</li>
+          </ul>
+        </div>
+        <div class="card amber">
+          <h3>The missing piece: sink state</h3>
+          <p>Every wrong symbol goes to a rejecting sink qD.</p>
+          <p>Any extra symbol after qA also goes to qD.</p>
+          <p>qD loops on both 0 and 1.</p>
+        </div>
+      </div>
+      <div class="warning">A chain showing only 1,0,1 is an illustration, not a complete DFA, unless all omitted transitions are defined.</div>
+      <div class="refs">
+        <span class="ref theory">Theory Q16</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Official tracing questions</p>
+      <h2>Use a state table for Review Q39-41</h2>
+      <div class="grid-3 compact">
+        <div class="card blue">
+          <h3>Review Q39</h3>
+          <p>Trace input 100101 from start A.</p>
+          <p><strong>Final:</strong> C, accepted.</p>
+          <div class="answer">Answer A</div>
+        </div>
+        <div class="card green">
+          <h3>Review Q40</h3>
+          <p>Test each candidate until one finishes in D.</p>
+          <p><strong>Accepted:</strong> 0100101.</p>
+          <div class="answer">Answer D</div>
+        </div>
+        <div class="card purple">
+          <h3>Review Q41</h3>
+          <p>A and B accept; D is a rejecting trap.</p>
+          <p><strong>Accepted:</strong> 1010.</p>
+          <div class="answer">Answer A</div>
+        </div>
+      </div>
+      <div class="big-idea">Write one row per symbol: symbol | old state | new state. Judge only the final state.</div>
+      <div class="refs">
+        <span class="ref">Review Q39-41</span>
+        <span class="ref theory">Theory Q9, Q14, Q15</span>
+        <span class="ref lecture">Lecture 9/15</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Limits of finite memory</p>
+      <h2>What finite automata can and cannot remember</h2>
+      <div class="grid-2">
+        <div class="card green">
+          <h3>Can recognize</h3>
+          <ul>
+            <li>Odd/even count</li>
+            <li>Count modulo 3</li>
+            <li>Ends with 01</li>
+            <li>Contains 101</li>
+            <li>At least three a’s</li>
+          </ul>
+        </div>
+        <div class="card amber">
+          <h3>Cannot generally recognize</h3>
+          <ul>
+            <li>Arbitrarily balanced parentheses</li>
+            <li>0<sup>n</sup>1<sup>n</sup> for arbitrary n</li>
+            <li>Arbitrary palindromes</li>
+            <li>Exact unbounded counts</li>
+          </ul>
+        </div>
+      </div>
+      <p>A finite number of states can remember only a finite set of summaries.</p>
+      <div class="refs">
+        <span class="ref theory">Theory Q7, Q11</span>
+        <span class="ref lecture">Lectures 9/10, 9/15</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">From finite automaton to Turing machine</p>
+      <h2>External writable memory changes the model</h2>
+      <div class="grid-2">
+        <div class="card blue">
+          <h3>Finite automaton</h3>
+          <p>Reads one symbol at a time and changes finite state.</p>
+          <p>Cannot rewrite input or revisit arbitrary stored information.</p>
+        </div>
+        <div class="card purple">
+          <h3>Turing machine</h3>
+          <p>Adds an effectively infinite tape and a read/write head.</p>
+          <p>Can write symbols and move left or right.</p>
+        </div>
+      </div>
+      <div class="formula small">finite automaton + external read/write memory = Turing machine</div>
+      <div class="answer">Review Q43: C. Review Q44: C — write on tape and move the head left/right.</div>
+      <div class="refs">
+        <span class="ref">Review Q43-44</span>
+        <span class="ref lecture">Lecture 9/15</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">The conceptual bridge</p>
+      <h2>How neurons implement an automaton</h2>
+      <div class="grid-2">
+        <div>
+          <p>Use one neuron (or bit pattern) to represent each state:</p>
+          <ul>
+            <li>E<sub>t</sub>=1: currently even</li>
+            <li>O<sub>t</sub>=1: currently odd</li>
+            <li>I<sub>t</sub>: current input symbol</li>
+          </ul>
+        </div>
+        <div>
+          <div class="formula small">O<sub>t+1</sub>=(E<sub>t</sub> AND I<sub>t</sub>) OR (O<sub>t</sub> AND NOT I<sub>t</sub>)</div>
+          <div class="formula small">E<sub>t+1</sub>=(E<sub>t</sub> AND NOT I<sub>t</sub>) OR (O<sub>t</sub> AND I<sub>t</sub>)</div>
+        </div>
+      </div>
+      <div class="big-idea">Feed the state outputs back as inputs at the next time step. That feedback creates finite memory: a recurrent network.</div>
+      <div class="refs">
+        <span class="ref">Review Q25, Q43</span>
+        <span class="ref theory">Theory Q4-16 concept link</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Complete exam map</p>
+      <h2>Every relevant official question</h2>
+      <div class="question-map">
+        <div class="head">Concept</div><div class="head">Review questions</div><div class="head">Theory questions</div>
+        <div>Boolean foundation</div><div>Q22 truth rows; Q23 contradiction; Q24 iff; Q25 completeness</div><div>Q1-3 expression evaluation</div>
+        <div>MP rule/calculation</div><div>Q26 identify AND; Q30 calculate output</div><div>Q4 firing rule</div>
+        <div>MP gate design</div><div>Q25 completeness supports networks</div><div>Q5 AND; Q6 NOT; Q13 OR</div>
+        <div>FA notation/language</div><div>Q33 accept symbol; Q36 language; Q38 final-state rule</div><div>Q7 language; Q8 accept state</div>
+        <div>FA tracing</div><div>Q37 and Q39-41</div><div>Q9 trace 11010; Q10 examples; Q12 count a; Q14 trace 10; Q15 trace 11</div>
+        <div>FA edge cases/design</div><div>Q38 final state</div><div>Q11 infinite input; Q16 exactly 101</div>
+        <div>FA vs TM</div><div>Q43 external memory; Q44 tape/head</div><div>Conceptual extension</div>
+      </div>
+      <div class="answer">Study priority: master the procedure, then use the question number as a retrieval cue.</div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Final checklist</p>
+      <h2>What you should be able to do without notes</h2>
+      <div class="grid-2">
+        <div class="card blue">
+          <h3>McCulloch-Pitts</h3>
+          <ul>
+            <li>Compute s=&Sigma;w<sub>i</sub>x<sub>i</sub></li>
+            <li>Apply s &ge; &theta;</li>
+            <li>Construct AND, OR, NOT</li>
+            <li>Explain why XOR needs a network</li>
+          </ul>
+        </div>
+        <div class="card green">
+          <h3>Finite automata</h3>
+          <ul>
+            <li>Identify start and accept states</li>
+            <li>Trace one transition per symbol</li>
+            <li>Describe the accepted language</li>
+            <li>Design progress and sink states</li>
+          </ul>
+        </div>
+      </div>
+      <div class="big-idea">Neuron: current-input decision. Automaton: old-state + current-input decision. Recurrent neural network: neurons whose outputs become the next state.</div>
+      <div class="refs">
+        <span class="ref">Relevant Review Q22-26, 30, 33, 36-44 covered</span>
+        <span class="ref theory">Theory Q1-16 covered</span>
+      </div>
+    </section>
+  </main>
+
+  <div class="nav" aria-label="Slide navigation">
+    <button id="prev" aria-label="Previous slide">&larr;</button>
+    <span class="counter" id="counter">1 / 25</span>
+    <button id="next" aria-label="Next slide">&rarr;</button>
+  </div>
+  <div class="progress" id="progress"></div>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll(".slide")];
+      const counter = document.getElementById("counter");
+      const progress = document.getElementById("progress");
+      let current = 0;
+
+      function show(index, updateHash = true) {
+        current = Math.max(0, Math.min(slides.length - 1, index));
+        slides.forEach((slide, i) => slide.classList.toggle("active", i === current));
+        counter.textContent = `${current + 1} / ${slides.length}`;
+        progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+        if (updateHash) history.replaceState(null, "", `#${current + 1}`);
+      }
+
+      function fromHash() {
+        const requested = Number(location.hash.slice(1));
+        show(Number.isFinite(requested) && requested > 0 ? requested - 1 : 0, false);
+      }
+
+      document.getElementById("prev").addEventListener("click", () => show(current - 1));
+      document.getElementById("next").addEventListener("click", () => show(current + 1));
+
+      document.addEventListener("keydown", event => {
+        if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(event.key)) {
+          event.preventDefault();
+          show(current + 1);
+        } else if (["ArrowLeft", "ArrowUp", "PageUp"].includes(event.key)) {
+          event.preventDefault();
+          show(current - 1);
+        } else if (event.key === "Home") {
+          show(0);
+        } else if (event.key === "End") {
+          show(slides.length - 1);
+        }
+      });
+
+      let touchStart = null;
+      document.addEventListener("touchstart", event => {
+        touchStart = event.changedTouches[0].clientX;
+      }, { passive: true });
+      document.addEventListener("touchend", event => {
+        if (touchStart === null) return;
+        const delta = event.changedTouches[0].clientX - touchStart;
+        if (Math.abs(delta) > 50) show(current + (delta < 0 ? 1 : -1));
+        touchStart = null;
+      }, { passive: true });
+
+      window.addEventListener("hashchange", fromHash);
+      fromHash();
+    })();
+  </script>
+</body>
+</html>
