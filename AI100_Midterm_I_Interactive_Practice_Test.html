@@ -1,0 +1,1469 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 100 Midterm I - Interactive Practice Test</title>
+  <style>
+    :root {
+      --navy: #102a43;
+      --navy-2: #173f66;
+      --blue: #1f6feb;
+      --cyan: #22b8cf;
+      --green: #16825d;
+      --red: #c43d36;
+      --amber: #e69f00;
+      --purple: #7055bd;
+      --paper: #f7fafc;
+      --ink: #17212b;
+      --muted: #536575;
+      --line: #c9d5df;
+      --soft-blue: #e8f1ff;
+      --soft-green: #e6f6ee;
+      --soft-red: #fdeceb;
+      --soft-amber: #fff4d5;
+      --shadow: 0 18px 55px rgb(13 38 63 / 18%);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background: #d9e3eb;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      overflow-y: auto;
+      padding: clamp(28px, 4vh, 56px) clamp(30px, 5vw, 82px) 84px;
+      background:
+        radial-gradient(circle at 92% 8%, rgb(34 184 207 / 13%), transparent 25%),
+        linear-gradient(135deg, #fff, var(--paper));
+    }
+
+    .screen.active {
+      display: block;
+      animation: enter 180ms ease-out;
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateX(12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .screen::before {
+      content: "";
+      position: fixed;
+      z-index: 5;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan), var(--purple));
+    }
+
+    .hero {
+      color: white;
+      background:
+        radial-gradient(circle at 80% 20%, rgb(34 184 207 / 24%), transparent 27%),
+        radial-gradient(circle at 10% 85%, rgb(112 85 189 / 28%), transparent 31%),
+        linear-gradient(145deg, #071b2f, #173f66 60%, #0e5b70);
+    }
+
+    .hero::before {
+      background: linear-gradient(90deg, #67e8f9, #f5c451);
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5em;
+      color: var(--blue);
+      font-size: clamp(14px, 1.4vw, 22px);
+      font-weight: 850;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .hero .eyebrow { color: #8fe8f2; }
+
+    h1 {
+      max-width: 1150px;
+      margin: 0 0 0.3em;
+      font-size: clamp(48px, 6.2vw, 94px);
+      line-height: 0.98;
+      letter-spacing: -0.048em;
+    }
+
+    h2 {
+      max-width: 1300px;
+      margin: 0 0 0.55em;
+      color: var(--navy);
+      font-size: clamp(31px, 4vw, 61px);
+      line-height: 1.04;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      margin: 0 0 0.35em;
+      color: var(--navy);
+      font-size: clamp(20px, 2vw, 31px);
+    }
+
+    p,
+    li {
+      font-size: clamp(17px, 1.55vw, 25px);
+      line-height: 1.36;
+    }
+
+    p { margin: 0.45em 0; }
+    ul, ol { margin: 0.5em 0; padding-left: 1.25em; }
+    li { margin: 0.24em 0; }
+    strong { color: var(--navy); }
+    .hero strong { color: white; }
+
+    .subtitle {
+      max-width: 1000px;
+      color: #dceaf5;
+      font-size: clamp(21px, 2.3vw, 35px);
+      line-height: 1.3;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(18px, 2.5vw, 40px);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(14px, 1.8vw, 28px);
+    }
+
+    .card {
+      padding: clamp(15px, 1.7vw, 28px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgb(255 255 255 / 90%);
+      box-shadow: 0 6px 20px rgb(13 38 63 / 8%);
+    }
+
+    .card.blue { border-top: 6px solid var(--blue); }
+    .card.green { border-top: 6px solid var(--green); }
+    .card.amber { border-top: 6px solid var(--amber); }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 1em 0;
+    }
+
+    .badge {
+      padding: 0.42em 0.72em;
+      border-radius: 999px;
+      color: var(--navy);
+      background: var(--soft-amber);
+      border: 1px solid #e2bd64;
+      font-size: clamp(12px, 1.05vw, 17px);
+      font-weight: 800;
+    }
+
+    .primary,
+    .secondary {
+      border: 0;
+      border-radius: 12px;
+      padding: 0.72em 1.1em;
+      font-size: clamp(16px, 1.35vw, 22px);
+      font-weight: 800;
+    }
+
+    .primary {
+      color: white;
+      background: var(--blue);
+      box-shadow: 0 7px 18px rgb(31 111 235 / 25%);
+    }
+
+    .primary:hover { background: #155ac0; }
+
+    .secondary {
+      color: var(--navy);
+      background: var(--soft-blue);
+      border: 1px solid #a9c3e6;
+    }
+
+    .hero .primary {
+      color: var(--navy);
+      background: #8fe8f2;
+      box-shadow: none;
+    }
+
+    .question-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6em;
+    }
+
+    .topic {
+      padding: 0.38em 0.7em;
+      border-radius: 999px;
+      color: white;
+      background: var(--purple);
+      font-size: clamp(12px, 1vw, 16px);
+      font-weight: 850;
+    }
+
+    .points {
+      color: var(--muted);
+      font-size: clamp(13px, 1.1vw, 18px);
+      font-weight: 750;
+    }
+
+    .stem {
+      margin-bottom: 0.65em;
+      color: var(--navy);
+      font-size: clamp(26px, 3vw, 46px);
+      font-weight: 760;
+      line-height: 1.16;
+    }
+
+    .context {
+      margin: -0.2em 0 0.8em;
+      padding: 0.65em 0.8em;
+      border-left: 6px solid var(--cyan);
+      border-radius: 0 12px 12px 0;
+      background: var(--soft-blue);
+      font-size: clamp(16px, 1.35vw, 22px);
+      line-height: 1.35;
+      white-space: pre-line;
+    }
+
+    .options {
+      display: grid;
+      gap: 12px;
+      max-width: 1300px;
+    }
+
+    .option {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      padding: 0.72em 0.85em;
+      border: 2px solid #c7d5e0;
+      border-radius: 14px;
+      color: var(--ink);
+      background: white;
+      text-align: left;
+      font-size: clamp(17px, 1.55vw, 25px);
+      transition: transform 100ms ease, border-color 100ms ease, background 100ms ease;
+    }
+
+    .option:hover:not(:disabled) {
+      border-color: var(--blue);
+      transform: translateX(4px);
+    }
+
+    .option:disabled { cursor: default; }
+
+    .letter {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      background: var(--navy-2);
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .option.correct {
+      border-color: var(--green);
+      background: var(--soft-green);
+    }
+
+    .option.correct .letter { background: var(--green); }
+
+    .option.incorrect {
+      border-color: var(--red);
+      background: var(--soft-red);
+    }
+
+    .option.incorrect .letter { background: var(--red); }
+
+    .feedback {
+      display: none;
+      max-width: 1300px;
+      margin-top: 0.8em;
+      padding: 0.8em 0.95em;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+      font-size: clamp(16px, 1.35vw, 22px);
+      line-height: 1.36;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.good { border-color: #84c6a7; background: var(--soft-green); }
+    .feedback.bad { border-color: #e3aaa6; background: var(--soft-red); }
+
+    .feedback-title {
+      margin-bottom: 0.25em;
+      font-size: 1.15em;
+      font-weight: 850;
+    }
+
+    .theory-box textarea {
+      width: 100%;
+      min-height: 24vh;
+      resize: vertical;
+      padding: 0.8em;
+      border: 2px solid #b9c9d5;
+      border-radius: 12px;
+      color: var(--ink);
+      background: white;
+      font-size: clamp(15px, 1.3vw, 21px);
+      line-height: 1.4;
+    }
+
+    .theory-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 0.7em;
+    }
+
+    .model-answer {
+      display: none;
+      margin-top: 0.85em;
+      padding: 0.85em 1em;
+      border: 1px solid #9dbce0;
+      border-radius: 14px;
+      background: var(--soft-blue);
+    }
+
+    .model-answer.show { display: block; }
+
+    .rubric {
+      display: grid;
+      gap: 8px;
+      margin-top: 0.6em;
+    }
+
+    .rubric label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 0.45em 0.55em;
+      border-radius: 9px;
+      background: white;
+      font-size: clamp(14px, 1.2vw, 19px);
+    }
+
+    .rubric input {
+      width: 19px;
+      height: 19px;
+      margin-top: 2px;
+    }
+
+    .toolbar {
+      position: fixed;
+      z-index: 20;
+      right: 16px;
+      bottom: 13px;
+      left: 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .toolbar.show { display: flex; }
+
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px;
+      border: 1px solid rgb(255 255 255 / 45%);
+      border-radius: 999px;
+      background: rgb(16 42 67 / 91%);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+    }
+
+    .toolbar button {
+      min-width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 999px;
+      color: white;
+      background: rgb(255 255 255 / 12%);
+      font-weight: 800;
+    }
+
+    .toolbar button:hover { background: var(--blue); }
+
+    .nav-label,
+    .timer,
+    .live-score {
+      padding: 0 8px;
+      color: white;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .timer.warning { color: #ffd166; }
+    .timer.danger { color: #ff9b93; }
+
+    .progress {
+      position: fixed;
+      z-index: 21;
+      bottom: 0;
+      left: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      transition: width 160ms ease;
+    }
+
+    .result-score {
+      font-size: clamp(52px, 8vw, 120px);
+      color: var(--blue);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .result-grade {
+      color: var(--navy);
+      font-size: clamp(25px, 3vw, 44px);
+      font-weight: 800;
+    }
+
+    .breakdown {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    .breakdown th,
+    .breakdown td {
+      padding: 0.55em 0.7em;
+      border: 1px solid var(--line);
+      font-size: clamp(14px, 1.2vw, 19px);
+      text-align: center;
+    }
+
+    .breakdown th {
+      color: var(--navy);
+      background: var(--soft-blue);
+    }
+
+    .review-list {
+      max-height: 31vh;
+      overflow: auto;
+      margin-top: 0.8em;
+      padding: 0.7em;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .review-item {
+      padding: 0.45em 0.55em;
+      border-bottom: 1px solid #e4ebf0;
+      font-size: clamp(13px, 1.1vw, 18px);
+    }
+
+    .review-item:last-child { border-bottom: 0; }
+
+    @media (max-width: 800px) {
+      .grid-2,
+      .grid-3 { grid-template-columns: 1fr; }
+      .screen { padding-left: 20px; padding-right: 20px; }
+      .toolbar { left: 8px; right: 8px; }
+      .live-score { display: none; }
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      html, body { overflow: visible; height: auto; background: white; }
+      .app { height: auto; }
+      .screen,
+      .screen.active {
+        position: relative;
+        display: block;
+        min-height: 190mm;
+        page-break-after: always;
+        break-after: page;
+        padding: 8mm;
+        animation: none;
+      }
+      .hero { color: var(--ink); background: white; }
+      .hero .eyebrow, .hero .subtitle { color: var(--ink); }
+      .toolbar, .progress, #results { display: none !important; }
+      .model-answer { display: block; }
+      .feedback { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="screen hero active" id="intro">
+      <p class="eyebrow">AI 100 | Midterm I Practice Examination</p>
+      <h1>Interactive Practice Test</h1>
+      <p class="subtitle">Original questions modeled on the official study guide, review/theory formats, textbook chapters, and lecture emphasis.</p>
+      <div class="badge-row">
+        <span class="badge">Chapters 1, 2, 3, 4, 8, 9</span>
+        <span class="badge">25 MCQs</span>
+        <span class="badge">6 Theory Questions</span>
+        <span class="badge">60 Minutes</span>
+        <span class="badge">50 MCQ + 30 Theory Points</span>
+      </div>
+      <div class="grid-3">
+        <div class="card blue">
+          <h3>Instant reasoning</h3>
+          <p>Choose an MCQ response to see whether it is correct and why the selected distractor fails.</p>
+        </div>
+        <div class="card green">
+          <h3>Theory self-assessment</h3>
+          <p>Write your answer first, reveal the model response, then score yourself against the rubric.</p>
+        </div>
+        <div class="card amber">
+          <h3>Exam conditions</h3>
+          <p>The timer is optional for learning, but try one uninterrupted attempt before reviewing notes.</p>
+        </div>
+      </div>
+      <p><strong>Recommended:</strong> Use full-screen mode. Do not use the Back button; use the exam controls.</p>
+      <button class="primary" id="startBtn">Start 60-minute practice test</button>
+      <button class="secondary" id="studyBtn">Study mode (timer off)</button>
+    </section>
+
+    <section class="screen" id="questionScreen">
+      <div class="question-header">
+        <span class="topic" id="qTopic"></span>
+        <span class="points" id="qPoints"></span>
+      </div>
+      <div class="stem" id="qStem"></div>
+      <div class="context" id="qContext"></div>
+      <div id="qBody"></div>
+    </section>
+
+    <section class="screen" id="results">
+      <p class="eyebrow">Performance report</p>
+      <h2>Practice-test results</h2>
+      <div class="grid-2">
+        <div>
+          <div class="result-score" id="resultScore">0%</div>
+          <div class="result-grade" id="resultGrade"></div>
+          <p id="resultDetail"></p>
+          <div class="theory-actions">
+            <button class="primary" id="retryBtn">Retry entire test</button>
+            <button class="secondary" id="reviewWrongBtn">Review missed MCQs</button>
+          </div>
+        </div>
+        <div>
+          <table class="breakdown">
+            <thead><tr><th>Topic</th><th>Correct</th><th>Total</th><th>%</th></tr></thead>
+            <tbody id="breakdownBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="review-list" id="reviewList"></div>
+    </section>
+  </main>
+
+  <div class="toolbar" id="toolbar">
+    <div class="toolbar-group">
+      <button id="prevBtn" aria-label="Previous question">&larr;</button>
+      <span class="nav-label" id="navLabel"></span>
+      <button id="nextBtn" aria-label="Next question">&rarr;</button>
+    </div>
+    <div class="toolbar-group">
+      <span class="timer" id="timer">60:00</span>
+      <span class="live-score" id="liveScore">MCQ score: 0 / 0</span>
+      <button id="finishBtn">Finish</button>
+    </div>
+  </div>
+  <div class="progress" id="progress"></div>
+
+  <script>
+    const questions = [
+      {
+        type: "mcq",
+        topic: "AI Foundations",
+        stem: "Which statement most accurately distinguishes Weak AI from Strong AI in the course?",
+        options: [
+          "Weak AI says cognition can be modeled computationally; Strong AI says cognition is computation.",
+          "Weak AI builds narrow programs; Strong AI builds programs that always outperform humans.",
+          "Weak AI rejects computation; Strong AI accepts the Church–Turing thesis.",
+          "Weak AI applies only to robots; Strong AI applies only to software."
+        ],
+        answer: 0,
+        reason: "The distinction is about the claim being made: Weak AI proposes computational models of cognition, while Strong AI identifies cognition itself with computation. Narrow versus general performance is a different distinction.",
+        distractors: [
+          "",
+          "Capability breadth does not define the Weak/Strong hypotheses.",
+          "Weak AI does not reject computation; it relies on computational modeling.",
+          "The distinction is not based on embodiment."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "AI Foundations",
+        stem: "Why can behavioral evidence test Weak AI more directly than Strong AI?",
+        options: [
+          "Weak AI requires a robot body that can be directly inspected.",
+          "Weak AI predicts that a computational model can reproduce relevant behavior.",
+          "Strong AI never makes any claim about intelligent behavior.",
+          "Strong AI is false because machines use electricity."
+        ],
+        answer: 1,
+        reason: "Weak AI makes a modeling claim with observable behavioral predictions. Strong AI makes the deeper ontological claim that cognition is computation; matching behavior alone does not settle whether genuine mind or understanding is present.",
+        distractors: [
+          "A body is not required to test many computational models.",
+          "",
+          "Strong AI can imply behavioral competence, but behavior alone does not prove its ontological claim.",
+          "Physical implementation does not refute computation."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Computation & History",
+        stem: "What is the central claim of the Church–Turing thesis?",
+        options: [
+          "Every problem can be solved efficiently by a modern computer.",
+          "Every mathematically meaningful question has a yes/no algorithm.",
+          "Anything computable by an effective algorithm is computable by a Turing machine.",
+          "Turing machines are faster than all alternative computer architectures."
+        ],
+        answer: 2,
+        reason: "The thesis connects the informal idea of an effective algorithm with Turing-machine computability. It is about what is computable in principle—not efficiency, universal decidability, or speed.",
+        distractors: [
+          "Computability does not imply efficiency.",
+          "Undecidable problems show that not every question has an algorithm.",
+          "",
+          "A Turing machine is a theoretical model and can be extremely inefficient."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Computation & History",
+        stem: "Which historical pairing is correct?",
+        options: [
+          "Babbage — Boolean algebra",
+          "Ada Lovelace — recognition that programmable machines might manipulate symbols beyond arithmetic",
+          "Boole — invention of the Turing machine",
+          "McCarthy — construction of the Analytical Engine"
+        ],
+        answer: 1,
+        reason: "Lovelace recognized that a sufficiently general machine could manipulate symbols and potentially produce music or art, not merely calculate numbers.",
+        distractors: [
+          "Babbage designed the Analytical Engine; Boole developed Boolean algebra.",
+          "",
+          "Turing introduced the Turing-machine model.",
+          "McCarthy helped establish AI as a field; Babbage designed the Analytical Engine."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Intelligence",
+        stem: "A student solves unfamiliar puzzles creatively but performs only moderately on conventional IQ items. Which theory most directly warns against reducing that student's intelligence to one number?",
+        options: [
+          "Gardner's multiple intelligences",
+          "The Church–Turing thesis",
+          "The Chinese Room argument",
+          "Finite-state theory"
+        ],
+        answer: 0,
+        reason: "Gardner argues that intelligence consists of multiple capacities and cannot be adequately represented by a single IQ score.",
+        distractors: [
+          "",
+          "The Church–Turing thesis concerns computability.",
+          "The Chinese Room concerns syntax and understanding.",
+          "Finite-state theory concerns machines with finite memory."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Intelligence",
+        stem: "Using the historical child-IQ formula, what is the IQ of a child with estimated mental age 12 and chronological age 10?",
+        options: ["83", "100", "120", "122"],
+        answer: 2,
+        reason: "Historical IQ = 100 × mental age / chronological age = 100 × 12/10 = 120.",
+        distractors: [
+          "This reverses the ratio: 100 × 10/12 ≈ 83.",
+          "IQ 100 would require equal mental and chronological ages.",
+          "",
+          "The exact calculation gives 120, not 122."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Evaluating AI",
+        stem: "What does passing a conversational Turing Test most directly demonstrate?",
+        options: [
+          "The machine necessarily has conscious understanding.",
+          "The machine displays behavior that judges cannot reliably distinguish from the human comparison.",
+          "The machine's internal processes are biologically identical to a human brain.",
+          "The machine answers every question correctly."
+        ],
+        answer: 1,
+        reason: "The test is behavioral. Passing indicates convincing human-like conversational performance under the protocol, not consciousness, biological identity, perfect accuracy, or guaranteed semantic understanding.",
+        distractors: [
+          "Behavior alone does not resolve the other-minds or understanding question.",
+          "",
+          "The test does not inspect biological implementation.",
+          "A participant can make errors and still pass."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Evaluating AI",
+        stem: "Why was ELIZA important despite lacking genuine language understanding?",
+        options: [
+          "It proved that syntax always creates semantics.",
+          "It showed that users may attribute understanding and personhood to simple pattern-based behavior.",
+          "It was the first program to solve the Halting Problem.",
+          "It used a complete psychological model of every user."
+        ],
+        answer: 1,
+        reason: "ELIZA used keyword and transformation rules, yet users projected meaning and empathy onto it. This illustrates the ELIZA effect: fluent interaction can trigger unwarranted assumptions of understanding.",
+        distractors: [
+          "ELIZA is evidence against making that inference.",
+          "",
+          "The Halting Problem is undecidable.",
+          "ELIZA did not contain a complete psychological model."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Evaluating AI",
+        stem: "In the Chinese Room, the rulebook primarily supplies rules for manipulating symbols according to their:",
+        options: ["meaning and reference", "emotional importance", "shape and position", "spoken pronunciation"],
+        answer: 2,
+        reason: "The person manipulates symbols syntactically—by formal features such as shape and position—without knowing their semantic meaning.",
+        distractors: [
+          "Meaning and reference are semantics, which the thought experiment says are absent.",
+          "Emotional importance is irrelevant to the formal rules.",
+          "",
+          "The symbols need not be spoken."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Evaluating AI",
+        stem: "Which is the best example of a Reverse Turing Test?",
+        options: [
+          "A judge decides whether a conversation partner is human.",
+          "A CAPTCHA asks a user to prove to a computer that the user is human.",
+          "A machine generates a poem under constraints.",
+          "A system resolves an ambiguous pronoun."
+        ],
+        answer: 1,
+        reason: "In a Reverse Turing Test, the computer evaluates whether the participant is human. CAPTCHA is the standard example.",
+        distractors: [
+          "That is the ordinary Turing-Test direction.",
+          "",
+          "That resembles a creativity or Lovelace-style evaluation.",
+          "That resembles a Winograd-style commonsense test."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Boolean Logic",
+        stem: "For A=False, B=True, and C=False, what is the value of (NOT A OR B) AND NOT(B AND C)?",
+        options: ["True", "False", "Undefined", "It depends on evaluation order"],
+        answer: 0,
+        reason: "NOT A=True, so (NOT A OR B)=True. B AND C=False, so NOT(B AND C)=True. True AND True=True.",
+        distractors: [
+          "",
+          "Both sides of the final AND are True.",
+          "All values and operators are defined.",
+          "Standard precedence produces a unique result."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Boolean Logic",
+        stem: "In how many truth-table rows is (X OR Y) AND NOT Z true?",
+        options: ["2", "3", "4", "6"],
+        answer: 1,
+        reason: "NOT Z requires Z=0. With Z fixed at 0, X OR Y is true for (0,1), (1,0), and (1,1): three rows.",
+        distractors: [
+          "This misses one of the three nonzero X,Y combinations.",
+          "",
+          "There are four X,Y combinations, but (0,0) makes OR false.",
+          "Z must be 0, eliminating half the eight rows."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Neural Computation",
+        stem: "A McCulloch–Pitts neuron has weights (1,1,1) and threshold 2. Which input makes it output 0?",
+        options: ["110", "101", "011", "100"],
+        answer: 3,
+        reason: "The neuron fires when at least two inputs are 1. Input 100 has weighted sum 1, below threshold 2, so the output is 0.",
+        distractors: [
+          "110 has sum 2, so it fires.",
+          "101 has sum 2, so it fires.",
+          "011 has sum 2, so it fires.",
+          ""
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Neural Computation",
+        stem: "Which parameters correctly implement NOT for a binary input under the course's s ≥ θ firing rule?",
+        options: [
+          "w=1, θ=1",
+          "w=-1, θ=-0.5",
+          "w=1, θ=2",
+          "w=-1, θ=1"
+        ],
+        answer: 1,
+        reason: "For x=0, s=0 ≥ -0.5, yielding 1. For x=1, s=-1 < -0.5, yielding 0. The negative weight inhibits firing when the input is 1.",
+        distractors: [
+          "This reproduces the input rather than negating it.",
+          "",
+          "This outputs 0 for both binary inputs.",
+          "This also outputs 0 for both binary inputs."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Neural Computation",
+        stem: "Why can no single threshold neuron compute XOR?",
+        options: [
+          "XOR has three inputs.",
+          "XOR requires an infinite number of states.",
+          "XOR's positive and negative examples are not linearly separable.",
+          "Threshold neurons cannot use negative weights."
+        ],
+        answer: 2,
+        reason: "The XOR-positive points (0,1) and (1,0) lie diagonally opposite, so one linear decision boundary cannot separate them from (0,0) and (1,1). A multilayer network can combine AND, OR, and NOT to compute XOR.",
+        distractors: [
+          "Standard XOR here has two inputs.",
+          "XOR is a fixed Boolean function and needs no unbounded memory.",
+          "",
+          "Threshold neurons may use negative weights."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Finite Automata",
+        stem: "A finite automaton visits an accept state after the third symbol, then finishes the string in a non-accept state. What is the result?",
+        options: [
+          "Accepted because an accept state was visited",
+          "Rejected because the final state is non-accepting",
+          "The string is restarted",
+          "The machine chooses whichever state was visited longer"
+        ],
+        answer: 1,
+        reason: "Ordinary finite-string acceptance depends only on the state after all input symbols have been consumed. Visiting an accept state early is insufficient.",
+        distractors: [
+          "Only the final state determines acceptance.",
+          "",
+          "A DFA does not automatically restart.",
+          "Time spent in states is irrelevant."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Finite Automata",
+        stem: "A two-state machine starts in EVEN, toggles state on each 1, and loops on 0. Which string is accepted if ODD is the only accept state?",
+        options: ["101", "1100", "000", "1110"],
+        answer: 3,
+        reason: "The machine accepts strings with an odd number of 1s. 1110 contains three 1s. The other choices contain two, two, and zero 1s respectively.",
+        distractors: [
+          "101 contains two 1s and ends EVEN.",
+          "1100 contains two 1s and ends EVEN.",
+          "000 contains zero 1s and remains EVEN.",
+          ""
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Finite Automata",
+        stem: "A three-state machine advances q0→q1→q2→q0 on 0 and loops on 1. If q0 is accepting, which language does it recognize?",
+        options: [
+          "Strings with exactly three 0s",
+          "Strings whose total length is a multiple of three",
+          "Strings whose number of 0s is a multiple of three",
+          "Strings ending in 000"
+        ],
+        answer: 2,
+        reason: "The state records the count of 0s modulo 3. Every third 0 returns to q0; 1s do not change the count.",
+        distractors: [
+          "The machine also accepts 0, 6, 9, ... zeros—not only exactly three.",
+          "1s loop, so total length is not what is counted.",
+          "",
+          "The three 0s need not be consecutive or at the end."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Finite Automata",
+        stem: "Why does a complete DFA for exactly the string 101 need a rejecting sink state?",
+        options: [
+          "To store an unlimited number of wrong symbols",
+          "To define transitions for mismatches and extra symbols that can no longer form exactly 101",
+          "To make the automaton nondeterministic",
+          "To accept every string containing 101"
+        ],
+        answer: 1,
+        reason: "A DFA needs a transition for every state-symbol pair. Once a mismatch or extra symbol makes equality with exactly 101 impossible, the machine enters a nonaccepting sink that loops forever.",
+        distractors: [
+          "A sink is one finite state, not unbounded storage.",
+          "",
+          "A complete DFA remains deterministic.",
+          "That would recognize 'contains 101,' a different language."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Models of Computation",
+        stem: "What capability most clearly distinguishes a Turing machine from a finite automaton?",
+        options: [
+          "Reading one input symbol at a time",
+          "Changing state",
+          "Having an accepting state",
+          "Writing to and revisiting an effectively unbounded tape"
+        ],
+        answer: 3,
+        reason: "Both models read symbols, change state, and accept/reject. The Turing machine adds external read/write memory that its head can revisit.",
+        distractors: [
+          "Finite automata also read symbols one at a time.",
+          "Finite automata also change state.",
+          "Finite automata also have accepting states.",
+          ""
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Knowledge Representation",
+        stem: "Why can adding more detail make a representation worse for a task?",
+        options: [
+          "More detail always makes the representation logically inconsistent.",
+          "Extra detail can increase memory and search cost while obscuring task-relevant structure.",
+          "Computers cannot store more than one feature per object.",
+          "A useful representation must reproduce the complete physical world."
+        ],
+        answer: 1,
+        reason: "Representations are task-relative abstractions. Irrelevant detail can consume resources and enlarge the search space without improving decisions.",
+        distractors: [
+          "Detail does not automatically create inconsistency.",
+          "",
+          "Computers can store many features.",
+          "Complete fidelity would defeat the purpose of a useful surrogate."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Knowledge Representation",
+        stem: "For a network of one-way roads with travel distances, which graph representation is appropriate?",
+        options: [
+          "Undirected and unweighted",
+          "Directed and weighted",
+          "Undirected and necessarily planar",
+          "A feature space with no edges"
+        ],
+        answer: 1,
+        reason: "One-way travel requires directed edges, and distances are edge weights. Planarity is not guaranteed or required.",
+        distractors: [
+          "Undirected edges would incorrectly allow both travel directions, and unweighted edges discard distance.",
+          "",
+          "Road graphs need not be planar in the abstract representation.",
+          "Connectivity is central, so graph edges are needed."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Problem Formulation",
+        stem: "Which item is missing from this state-space formulation: state representation, start state, actions, and action preconditions/postconditions?",
+        options: [
+          "A goal test",
+          "A neural-network weight",
+          "A Turing-machine tape alphabet",
+          "An IQ score"
+        ],
+        answer: 0,
+        reason: "A search problem needs a way to recognize success: a goal state or goal predicate/test. The other items are unrelated to general state-space formulation.",
+        distractors: [
+          "",
+          "Search problems do not generally require a neural model.",
+          "A state-space problem need not be a Turing machine.",
+          "IQ is irrelevant to the formulation."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Search",
+        stem: "A route with two edges costs 100, while a route with four edges costs 20. Which algorithm is guaranteed to prefer the cost-20 route under nonnegative edge costs?",
+        options: [
+          "Breadth-first search",
+          "Depth-first search",
+          "Uniform-cost search",
+          "Any algorithm that visits the fewest nodes"
+        ],
+        answer: 2,
+        reason: "Uniform-cost search orders the frontier by accumulated path cost g(n), not by depth. BFS minimizes edge count only when all step costs are equal.",
+        distractors: [
+          "BFS prefers fewer edges and could choose the cost-100 route.",
+          "DFS has no least-cost guarantee.",
+          "",
+          "Number of expanded nodes does not define path optimality."
+        ]
+      },
+      {
+        type: "mcq",
+        topic: "Search",
+        stem: "Why can iterative deepening be preferable to ordinary BFS when the solution depth is unknown?",
+        options: [
+          "It always expands fewer nodes than every other algorithm.",
+          "It combines shallow-solution completeness with DFS-like low memory.",
+          "It handles negative edge costs optimally.",
+          "It never revisits a shallow node."
+        ],
+        answer: 1,
+        reason: "Iterative deepening repeats depth-limited DFS with increasing limits. It finds a shallow finite-depth solution like BFS while retaining memory roughly linear in depth.",
+        distractors: [
+          "It repeats shallow work and does not universally expand fewer nodes.",
+          "",
+          "It is not a negative-cost shortest-path method.",
+          "It deliberately revisits shallow nodes across iterations."
+        ]
+      },
+      {
+        type: "theory",
+        topic: "AI Foundations",
+        stem: "Explain Strong AI and Weak AI, then evaluate what a machine's success on a conversational Turing Test would and would not establish.",
+        points: 5,
+        prompt: "Write a structured answer of approximately 120–180 words. Include the two hypotheses, the behavioral nature of the test, and one limitation.",
+        model: [
+          "Strong AI claims that cognition is computation. Weak AI claims that cognition can be modeled computationally.",
+          "Weak AI can be investigated through behavioral predictions: if a computational model reproduces relevant intelligent behavior, that supports its adequacy as a model.",
+          "In the modified imitation game, a computer succeeds when judges cannot distinguish it from the human comparison at a reliably lower rate under the specified protocol.",
+          "Success demonstrates behavioral competence under those conditions; it does not by itself prove consciousness, genuine semantic understanding, or the truth of Strong AI.",
+          "The conclusion depends on test duration, judges, rules, and the range of behavior examined."
+        ],
+        rubric: [
+          "Correctly defines Strong AI.",
+          "Correctly defines Weak AI.",
+          "Accurately explains the behavioral Turing-Test criterion.",
+          "States what passing supports.",
+          "States at least one principled limitation."
+        ]
+      },
+      {
+        type: "theory",
+        topic: "Evaluating AI",
+        stem: "Compare ELIZA and the Chinese Room as warnings against equating successful symbol use with understanding.",
+        points: 5,
+        prompt: "Use both examples. Distinguish syntax from semantics and mention one response or objection to the Chinese Room.",
+        model: [
+          "ELIZA generated convincing therapist-like responses using keywords, pronoun substitutions, templates, and fallback rules. Users nevertheless attributed empathy and understanding to it, illustrating that fluent behavior can invite projection.",
+          "Searle's Chinese Room makes a related conceptual point. A person follows formal rules to manipulate Chinese symbols by shape and position—syntax—while lacking their meaning—semantics.",
+          "Correct outputs can therefore demonstrate competence without proving comprehension.",
+          "The systems reply argues that although the person does not understand, the complete person-plus-room-plus-rulebook system may understand.",
+          "Searle answers that even internalizing the complete rule system need not create semantic understanding. His conclusion is that program execution alone is insufficient, not that no machine could ever understand."
+        ],
+        rubric: [
+          "Explains ELIZA's pattern-based mechanism.",
+          "Explains user projection or the ELIZA effect.",
+          "Defines syntax versus semantics using the Chinese Room.",
+          "States the competence/comprehension distinction.",
+          "Includes the systems reply or another relevant objection and nuance."
+        ]
+      },
+      {
+        type: "theory",
+        topic: "Neural Computation",
+        stem: "Design McCulloch–Pitts neurons for AND, OR, and NOT, and explain why a network—not one neuron—is needed for XOR.",
+        points: 5,
+        prompt: "Give weights, thresholds, the firing rule, and the linear-separability explanation.",
+        model: [
+          "A McCulloch–Pitts unit computes s=Σwᵢxᵢ and outputs 1 when s≥θ; otherwise it outputs 0.",
+          "AND for two binary inputs: w=(1,1), θ=2. Only input 11 reaches the threshold.",
+          "OR: w=(1,1), θ=1. Any input containing at least one 1 reaches the threshold.",
+          "NOT: w=-1, θ=-0.5. Input 0 yields s=0 and output 1; input 1 yields s=-1 and output 0.",
+          "XOR is not linearly separable: the positive points 01 and 10 cannot be separated from 00 and 11 by one linear threshold. A multilayer network can implement XOR as (x₁ OR x₂) AND NOT(x₁ AND x₂)."
+        ],
+        rubric: [
+          "States the weighted-sum and threshold rule.",
+          "Gives correct AND parameters.",
+          "Gives correct OR parameters.",
+          "Gives correct NOT parameters and verifies both inputs.",
+          "Explains linear separability and a network construction for XOR."
+        ]
+      },
+      {
+        type: "theory",
+        topic: "Finite Automata",
+        stem: "Design a complete deterministic finite automaton that accepts exactly 110 and nothing else.",
+        points: 5,
+        prompt: "Define the states, start/accept states, and transitions for both 0 and 1 from every state. Explain the sink state.",
+        model: [
+          "Use q0 as start, q1 after matching 1, q2 after matching 11, qA after matching exactly 110, and qD as rejecting sink.",
+          "Transitions: q0: 1→q1, 0→qD. q1: 1→q2, 0→qD. q2: 0→qA, 1→qD.",
+          "From qA, both 0 and 1 go to qD because any extra symbol makes the string longer than exactly 110.",
+          "From qD, both symbols loop to qD because no continuation can repair an earlier mismatch.",
+          "Only qA is accepting. The machine accepts only when the input ends immediately after the successful 1,1,0 sequence."
+        ],
+        rubric: [
+          "Defines progress states for nothing, 1, 11, and 110.",
+          "Makes only the exact-match state accepting.",
+          "Defines all successful transitions correctly.",
+          "Routes every mismatch and extra symbol to a sink.",
+          "Defines sink loops and explains final-state acceptance."
+        ]
+      },
+      {
+        type: "theory",
+        topic: "Knowledge Representation",
+        stem: "Construct a useful representation for a campus route-planning agent and explain what information you retain and discard.",
+        points: 5,
+        prompt: "Specify nodes, edges, weights, directionality, a task-dependent abstraction choice, and why more detail is not automatically better.",
+        model: [
+          "Represent the campus as a weighted graph. Nodes are task-relevant locations such as buildings, entrances, parking areas, and transit stops.",
+          "Edges represent traversable paths. Use directed edges for one-way paths or restricted entrances and undirected edges where travel is possible both ways.",
+          "Weights depend on the task: distance for shortest walking route, expected time for fastest route, or accessibility cost for a wheelchair-accessible route.",
+          "Retain connectivity, restrictions, and relevant costs. Discard decorative landscaping, exact wall textures, and other details that do not affect the selected task.",
+          "Extra detail can increase memory and search cost and obscure useful structure. The best representation is not the most complete one, but the one that preserves what the task requires."
+        ],
+        rubric: [
+          "Defines meaningful graph nodes.",
+          "Defines edges and directionality.",
+          "Selects and justifies useful weights.",
+          "Identifies retained and discarded information.",
+          "Explains task-relative abstraction and the cost of irrelevant detail."
+        ]
+      },
+      {
+        type: "theory",
+        topic: "Search",
+        stem: "Compare BFS, DFS, iterative deepening, and uniform-cost search for solving a state-space problem.",
+        points: 5,
+        prompt: "Discuss frontier structure, completeness, optimality, memory, and when each method is suitable.",
+        model: [
+          "BFS uses a FIFO queue and expands the shallowest nodes first. With finite branching and a finite-depth goal it is complete; it is optimal only when step costs are equal. Its memory use is exponential in solution depth.",
+          "DFS uses a LIFO stack or recursion, follows one branch, and uses memory roughly linear in depth. It is not optimal and may fail to return from an infinite branch.",
+          "Iterative deepening repeats depth-limited DFS with limits 0,1,2,…, gaining BFS-like completeness and shallowest-solution behavior with DFS-like low memory.",
+          "Uniform-cost search orders the frontier by accumulated cost g(n). With nonnegative costs it returns a least-cost path when the cheapest removed path reaches a goal.",
+          "Choose based on whether depth or weighted cost matters, whether the space may be infinite, and how much memory is available."
+        ],
+        rubric: [
+          "Correctly describes BFS order, guarantees, and memory.",
+          "Correctly describes DFS order, limitation, and memory.",
+          "Explains iterative deepening's combined advantages.",
+          "Explains uniform-cost ordering and nonnegative-cost optimality.",
+          "Provides a sensible algorithm-selection comparison."
+        ]
+      }
+    ];
+
+    const state = {
+      index: 0,
+      answers: Array(questions.length).fill(null),
+      theoryScores: Array(questions.length).fill(0),
+      started: false,
+      studyMode: false,
+      remaining: 60 * 60,
+      timerId: null,
+      reviewQueue: null
+    };
+
+    const intro = document.getElementById("intro");
+    const questionScreen = document.getElementById("questionScreen");
+    const results = document.getElementById("results");
+    const toolbar = document.getElementById("toolbar");
+    const progress = document.getElementById("progress");
+    const qTopic = document.getElementById("qTopic");
+    const qPoints = document.getElementById("qPoints");
+    const qStem = document.getElementById("qStem");
+    const qContext = document.getElementById("qContext");
+    const qBody = document.getElementById("qBody");
+    const navLabel = document.getElementById("navLabel");
+    const liveScore = document.getElementById("liveScore");
+    const timer = document.getElementById("timer");
+
+    function start(studyMode) {
+      state.started = true;
+      state.studyMode = studyMode;
+      state.index = 0;
+      intro.classList.remove("active");
+      results.classList.remove("active");
+      questionScreen.classList.add("active");
+      toolbar.classList.add("show");
+      if (state.timerId) clearInterval(state.timerId);
+      state.remaining = 60 * 60;
+      updateTimer();
+      if (!studyMode) {
+        state.timerId = setInterval(() => {
+          state.remaining--;
+          updateTimer();
+          if (state.remaining <= 0) finish();
+        }, 1000);
+      } else {
+        timer.textContent = "Study mode";
+        timer.className = "timer";
+      }
+      render();
+    }
+
+    function updateTimer() {
+      const m = Math.floor(state.remaining / 60);
+      const s = state.remaining % 60;
+      timer.textContent = `${m}:${String(s).padStart(2, "0")}`;
+      timer.className = "timer";
+      if (state.remaining <= 300) timer.classList.add("danger");
+      else if (state.remaining <= 900) timer.classList.add("warning");
+    }
+
+    function render() {
+      const q = questions[state.index];
+      qTopic.textContent = q.topic;
+      qPoints.textContent = q.type === "mcq" ? "2 points" : `${q.points} points`;
+      qStem.textContent = `${q.type === "mcq" ? "MCQ" : "Theory"} ${questionNumberWithinType(state.index)}. ${q.stem}`;
+      qContext.textContent = q.type === "mcq" ? (q.context || "") : q.prompt;
+      qContext.style.display = qContext.textContent ? "block" : "none";
+      qBody.innerHTML = "";
+      if (q.type === "mcq") renderMcq(q);
+      else renderTheory(q);
+      navLabel.textContent = `${state.index + 1} / ${questions.length}`;
+      progress.style.width = `${((state.index + 1) / questions.length) * 100}%`;
+      updateLiveScore();
+      document.getElementById("prevBtn").disabled = state.index === 0;
+      document.getElementById("nextBtn").textContent = state.index === questions.length - 1 ? "Results" : "→";
+      questionScreen.scrollTop = 0;
+    }
+
+    function questionNumberWithinType(index) {
+      const type = questions[index].type;
+      return questions.slice(0, index + 1).filter(q => q.type === type).length;
+    }
+
+    function renderMcq(q) {
+      const selected = state.answers[state.index];
+      const options = document.createElement("div");
+      options.className = "options";
+      q.options.forEach((text, i) => {
+        const button = document.createElement("button");
+        button.className = "option";
+        if (selected !== null) {
+          button.disabled = true;
+          if (i === q.answer) button.classList.add("correct");
+          if (i === selected && selected !== q.answer) button.classList.add("incorrect");
+        }
+        button.innerHTML = `<span class="letter">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
+        button.addEventListener("click", () => choose(i));
+        options.appendChild(button);
+      });
+      qBody.appendChild(options);
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+      if (selected !== null) {
+        const correct = selected === q.answer;
+        feedback.classList.add("show", correct ? "good" : "bad");
+        const selectedNote = correct ? "" : `<p><strong>Why your choice fails:</strong> ${q.distractors[selected]}</p>`;
+        feedback.innerHTML = `
+          <div class="feedback-title">${correct ? "✓ Correct" : "✗ Incorrect"}</div>
+          <p><strong>Reasoning:</strong> ${q.reason}</p>
+          ${selectedNote}
+          <p><strong>Correct response:</strong> ${String.fromCharCode(65 + q.answer)} — ${q.options[q.answer]}</p>`;
+      }
+      qBody.appendChild(feedback);
+    }
+
+    function choose(option) {
+      if (state.answers[state.index] !== null) return;
+      state.answers[state.index] = option;
+      render();
+    }
+
+    function renderTheory(q) {
+      const saved = state.answers[state.index] || { text: "", revealed: false };
+      const box = document.createElement("div");
+      box.className = "theory-box";
+      box.innerHTML = `
+        <textarea aria-label="Theory response" placeholder="Write your answer before revealing the model response..."></textarea>
+        <div class="theory-actions">
+          <button class="primary reveal">Reveal model answer and rubric</button>
+          <button class="secondary clear">Clear response</button>
+        </div>
+        <div class="model-answer ${saved.revealed ? "show" : ""}">
+          <h3>Model answer</h3>
+          <ol>${q.model.map(item => `<li>${item}</li>`).join("")}</ol>
+          <h3>Self-scoring rubric: ${q.points} points</h3>
+          <div class="rubric">
+            ${q.rubric.map((item, i) => `<label><input type="checkbox" data-point="${i}" ${saved.checked?.includes(i) ? "checked" : ""}> <span>${item}</span></label>`).join("")}
+          </div>
+          <div class="answer" style="margin-top:.7em"><strong>Self-score:</strong> <span class="theory-score">${state.theoryScores[state.index]}</span> / ${q.points}</div>
+        </div>`;
+      const textarea = box.querySelector("textarea");
+      textarea.value = saved.text;
+      textarea.addEventListener("input", () => saveTheory(box));
+      box.querySelector(".reveal").addEventListener("click", () => {
+        const data = state.answers[state.index] || { text: textarea.value, checked: [] };
+        data.revealed = true;
+        state.answers[state.index] = data;
+        render();
+      });
+      box.querySelector(".clear").addEventListener("click", () => {
+        state.answers[state.index] = { text: "", revealed: saved.revealed, checked: [] };
+        state.theoryScores[state.index] = 0;
+        render();
+      });
+      box.querySelectorAll(".rubric input").forEach(input => {
+        input.addEventListener("change", () => saveTheory(box));
+      });
+      qBody.appendChild(box);
+    }
+
+    function saveTheory(box) {
+      const text = box.querySelector("textarea").value;
+      const checked = [...box.querySelectorAll(".rubric input:checked")].map(i => Number(i.dataset.point));
+      const current = state.answers[state.index] || {};
+      state.answers[state.index] = { text, revealed: current.revealed || false, checked };
+      state.theoryScores[state.index] = checked.length;
+      const score = box.querySelector(".theory-score");
+      if (score) score.textContent = checked.length;
+      updateLiveScore();
+    }
+
+    function updateLiveScore() {
+      let correct = 0;
+      let answered = 0;
+      questions.forEach((q, i) => {
+        if (q.type === "mcq" && state.answers[i] !== null) {
+          answered++;
+          if (state.answers[i] === q.answer) correct++;
+        }
+      });
+      liveScore.textContent = `MCQ score: ${correct} / ${answered}`;
+    }
+
+    function move(delta) {
+      const next = state.index + delta;
+      if (next < 0) return;
+      if (next >= questions.length) {
+        finish();
+        return;
+      }
+      state.index = next;
+      render();
+    }
+
+    function finish() {
+      if (state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+      questionScreen.classList.remove("active");
+      intro.classList.remove("active");
+      results.classList.add("active");
+      toolbar.classList.remove("show");
+      progress.style.width = "100%";
+      renderResults();
+    }
+
+    function renderResults() {
+      const mcqs = questions.map((q, i) => ({ q, i })).filter(x => x.q.type === "mcq");
+      const correct = mcqs.filter(x => state.answers[x.i] === x.q.answer).length;
+      const unanswered = mcqs.filter(x => state.answers[x.i] === null).length;
+      const mcqPoints = correct * 2;
+      const theoryPoints = state.theoryScores.reduce((a, b) => a + b, 0);
+      const total = mcqPoints + theoryPoints;
+      const max = mcqs.length * 2 + questions.filter(q => q.type === "theory").reduce((a, q) => a + q.points, 0);
+      const pct = Math.round(total / max * 100);
+      document.getElementById("resultScore").textContent = `${pct}%`;
+      document.getElementById("resultGrade").textContent =
+        pct >= 90 ? "Excellent exam readiness" :
+        pct >= 80 ? "Strong — review a few weak areas" :
+        pct >= 70 ? "Developing — targeted review needed" :
+        "Rebuild the foundations, then retry";
+      document.getElementById("resultDetail").textContent =
+        `MCQ: ${mcqPoints}/${mcqs.length * 2} points (${correct} correct, ${unanswered} unanswered). Theory self-score: ${theoryPoints}/30. Total: ${total}/${max}.`;
+
+      const topics = {};
+      mcqs.forEach(({q, i}) => {
+        topics[q.topic] ||= { correct: 0, total: 0 };
+        topics[q.topic].total++;
+        if (state.answers[i] === q.answer) topics[q.topic].correct++;
+      });
+      document.getElementById("breakdownBody").innerHTML = Object.entries(topics)
+        .map(([topic, x]) => `<tr><td>${topic}</td><td>${x.correct}</td><td>${x.total}</td><td>${Math.round(x.correct/x.total*100)}%</td></tr>`)
+        .join("");
+
+      const missed = mcqs.filter(({q, i}) => state.answers[i] !== q.answer);
+      document.getElementById("reviewList").innerHTML = missed.length
+        ? `<strong>MCQs to review:</strong>${missed.map(({q, i}) => `<div class="review-item">MCQ ${questionNumberWithinType(i)} — <strong>${q.topic}:</strong> ${q.stem}</div>`).join("")}`
+        : "<strong>Perfect MCQ score — no missed questions.</strong>";
+    }
+
+    function resetTest() {
+      state.answers = Array(questions.length).fill(null);
+      state.theoryScores = Array(questions.length).fill(0);
+      state.reviewQueue = null;
+      results.classList.remove("active");
+      intro.classList.add("active");
+      progress.style.width = "0";
+    }
+
+    function reviewWrong() {
+      const first = questions.findIndex((q, i) => q.type === "mcq" && state.answers[i] !== q.answer);
+      if (first < 0) return;
+      results.classList.remove("active");
+      questionScreen.classList.add("active");
+      toolbar.classList.add("show");
+      state.studyMode = true;
+      state.index = first;
+      timer.textContent = "Review mode";
+      render();
+    }
+
+    document.getElementById("startBtn").addEventListener("click", () => start(false));
+    document.getElementById("studyBtn").addEventListener("click", () => start(true));
+    document.getElementById("prevBtn").addEventListener("click", () => move(-1));
+    document.getElementById("nextBtn").addEventListener("click", () => move(1));
+    document.getElementById("finishBtn").addEventListener("click", finish);
+    document.getElementById("retryBtn").addEventListener("click", resetTest);
+    document.getElementById("reviewWrongBtn").addEventListener("click", reviewWrong);
+
+    document.addEventListener("keydown", event => {
+      if (!questionScreen.classList.contains("active")) return;
+      if (event.target.tagName === "TEXTAREA") return;
+      if (event.key === "ArrowRight" || event.key === "PageDown") move(1);
+      if (event.key === "ArrowLeft" || event.key === "PageUp") move(-1);
+      const q = questions[state.index];
+      if (q.type === "mcq" && ["1","2","3","4"].includes(event.key)) choose(Number(event.key)-1);
+    });
+  </script>
+</body>
+</html>

@@ -2,4 +2,6 @@
 
 [AI 100 Chapter 4 - McCulloch-Pitts Neurons and Finite Automata](https://imdrcee.github.io/AI100/AI100_Chapter4_Neurons_and_Finite_Automata_Slides.html)
 
+[AI 100 Midterm I - Interactive Practice Test](https://imdrcee.github.io/AI100/AI100_Midterm_I_Interactive_Practice_Test.html)
+
 [Instructions for continuing this project with another LLM](./LLM_CONTINUATION_GUIDE.md)
